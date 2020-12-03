@@ -1,0 +1,21 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "[typescript]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      },
+      "[javascript]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      },
+      "[json]": {
+        "editor.formatOnSave": true,
+        "editor.wordWrap": "on",
+        "editor.defaultFormatter": "vscode.json-language-features"
+      },
+      "[jsonc]": {
+        "editor.formatOnSave": true,
+        "editor.wordWrap": "on",
+        "editor.defaultFormatter": "vscode.json-language-features"
+      }
+}
