@@ -4,6 +4,8 @@
   "description": "Adapter to give access to GitHub Actions status via the CatLight Protocol",
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "lint": "eslint . --ext .ts",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "start": "node dist/index.js",
     "start:dev": "nodemon",
     "test": "test"
@@ -24,6 +26,11 @@
   "homepage": "https://github.com/tsimbalar/gha-build-monitor#readme",
   "devDependencies": {
     "@types/node": "14.14.10",
+    "@typescript-eslint/eslint-plugin": "4.9.0",
+    "@typescript-eslint/parser": "4.9.0",
+    "eslint": "7.14.0",
+    "eslint-config-prettier": "6.15.0",
+    "eslint-plugin-prettier": "3.2.0",
     "nodemon": "2.0.6",
     "prettier": "2.2.1",
     "rimraf": "3.0.2",
