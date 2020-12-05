@@ -27,5 +27,7 @@ module.exports = {
     'one-var': 'off',
     'capitalized-comments': 'off',
     'no-undefined': 'off',
+    'no-use-before-define': 'off',
+    'no-magic-numbers': 'off',
   },
 };
