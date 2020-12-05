@@ -4,11 +4,13 @@
   "description": "Adapter to give access to GitHub Actions status via the CatLight Protocol",
   "scripts": {
     "build": "rimraf ./dist && npm run tsoa:gen && tsc",
+    "check": "npm run ts:check && npm run lint",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "start": "node dist/index.js",
     "start:dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
     "test": "jest",
+    "ts:check": "tsc --noEmit --noErrorTruncation ",
     "tsoa:gen": "tsoa spec-and-routes"
   },
   "repository": {

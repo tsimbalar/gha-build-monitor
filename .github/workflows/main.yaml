@@ -1,0 +1,47 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Print GitHub context (for debug)
+        run: echo "$GITHUB_CONTEXT"
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.15.1"
+
+      # https://github.com/actions/cache/blob/v2/examples.md#macos-and-ubuntu
+      - name: Cache dependencies
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TSOA generation
+        run: .ci/check-if-tsoa-files-are-updated.sh
+
+      - name: Typescript compilation
+        run: npm run ts:check
+
+      - name: Typescript linting
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test
