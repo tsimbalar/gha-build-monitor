@@ -1,0 +1,19 @@
+{
+    "entryFile": "src/index.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": [
+        "src/api/**/*Controller.ts"
+    ],
+    "spec": {
+        "outputDirectory": "docs",
+        "specVersion": 3,
+        "yaml": true
+    },
+    "routes": {
+        "routesDir": "src/api",
+        "routesFileName": "tsoa-routes.generated.ts"
+    },
+    "ignore": [
+        "**/node_modules/**"
+    ]
+}
