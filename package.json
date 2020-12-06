@@ -1,6 +1,11 @@
 {
   "name": "gha-build-monitor",
   "version": "0.0.1",
+  "buildInfo": {
+    "commitSha": "_CI_GIT_COMMIT_SHA",
+    "buildDate": "_CI_BUILD_DATE",
+    "gitRef": "_CI_GIT_REF"
+  },
   "description": "Adapter to give access to GitHub Actions status via the CatLight Protocol",
   "scripts": {
     "build": "rimraf ./dist && npm run tsoa:gen && tsc",
