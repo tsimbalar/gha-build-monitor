@@ -15,7 +15,9 @@ module.exports = {
     'prettier/@typescript-eslint',
   ],
   rules: {
+    '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'explicit' }],
     'new-cap': ['error', { capIsNew: false }],
+    'max-params': ['error', { max: 4 }],
     'max-lines-per-function': 'off',
     '@typescript-eslint/require-await': 'off',
     'class-methods-use-this': 'off',
@@ -36,5 +38,9 @@ module.exports = {
     'line-comment-position': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',
+    'max-classes-per-file': 'off',
+    'prefer-destructuring': 'off',
+    '@typescript-eslint/no-explicit-any': 'off' /* default is warn */,
+    'init-declarations': 'off',
   },
 };

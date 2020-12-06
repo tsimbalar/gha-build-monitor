@@ -1,5 +1,5 @@
 import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTestTools';
-import { BasicBuildInfo } from '../api-types';
+import { BasicBuildInfoResponse } from '../api-types';
 
 describe('/basic', () => {
   describe('GET /basic', () => {
@@ -9,7 +9,7 @@ describe('/basic', () => {
       expect(response.status).toBe(200);
       expect(response.type).toBe('application/json');
 
-      const body = response.body as BasicBuildInfo;
+      const body = response.body as BasicBuildInfoResponse;
       expect(body.protocol).toBe('https://catlight.io/protocol/v1.0/basic');
     });
 
@@ -17,7 +17,7 @@ describe('/basic', () => {
       const agent = createTestAgent();
       const response = await agent.get('/basic').send();
 
-      const body = response.body as BasicBuildInfo;
+      const body = response.body as BasicBuildInfoResponse;
       expect(body.id).toMatch(/^gha-build-monitor.*/u);
       expect(body.name).toEqual('gha-build-monitor');
       expect(body.serverVersion).toMatch(/[0-9]+.[0-9]+.[0-9]+/u);
@@ -28,7 +28,7 @@ describe('/basic', () => {
       const agent = createTestAgent(installationId);
       const response = await agent.get('/basic').send();
 
-      const body = response.body as BasicBuildInfo;
+      const body = response.body as BasicBuildInfoResponse;
       expect(body.id).toMatch(RegExp(`${installationId}$`, 'u'));
     });
   });

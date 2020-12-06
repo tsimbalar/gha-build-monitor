@@ -13,7 +13,7 @@
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "start": "INSTALLATION_ID=installation_id_guid node dist/index.js",
-    "start:dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
+    "start:dev": "INSTALLATION_ID=installation_id_guid  concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
     "test": "jest",
     "ts:check": "tsc --noEmit --noErrorTruncation ",
     "tsoa:gen": "tsoa spec-and-routes"
@@ -55,6 +55,7 @@
     "typescript": "4.1.2"
   },
   "dependencies": {
+    "@octokit/rest": "18.0.12",
     "@tsoa/runtime": "3.4.0",
     "express": "4.17.1",
     "swagger-ui-express": "4.1.5"

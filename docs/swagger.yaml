@@ -157,9 +157,9 @@ components:
                 - spaces
             type: object
             additionalProperties: false
-        BasicBuildInfo:
+        BasicBuildInfoResponse:
             $ref: '#/components/schemas/Server'
-        HealthCheckSummaryResponse:
+        HealthCheckResponse:
             properties:
                 version:
                     type: string
@@ -173,7 +173,23 @@ components:
                 - buildInfo
             type: object
             additionalProperties: false
-    securitySchemes: {}
+        WhoAmIResponse:
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+            required:
+                - id
+                - name
+            type: object
+            additionalProperties: false
+    securitySchemes:
+        bearerAuth:
+            type: http
+            description: 'Bearer authentication - give access to the bearer of this token'
+            scheme: bearer
+            bearerFormat: JWT
 info:
     title: gha-build-monitor
     version: 0.0.1
@@ -193,8 +209,36 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/BasicBuildInfo'
+                                $ref: '#/components/schemas/BasicBuildInfoResponse'
             security: []
+            parameters: []
+    /_/healthcheck:
+        get:
+            operationId: GetHealthCheck
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HealthCheckResponse'
+            description: 'Gets an indication of the current health of the system'
+            security: []
+            parameters: []
+    /_/whoami:
+        get:
+            operationId: GetMe
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WhoAmIResponse'
+            description: 'Gets an indication of the current health of the system'
+            security:
+                -
+                    bearerAuth: []
             parameters: []
     /examples/basic/basic:
         get:
@@ -205,7 +249,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/BasicBuildInfo'
+                                $ref: '#/components/schemas/BasicBuildInfoResponse'
             security: []
             parameters: []
     /examples/basic/multi-space:
@@ -217,20 +261,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/BasicBuildInfo'
-            security: []
-            parameters: []
-    /healthcheck:
-        get:
-            operationId: Get
-            responses:
-                '200':
-                    description: Ok
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/HealthCheckSummaryResponse'
-            description: 'Gets an indication of the current health of the system'
+                                $ref: '#/components/schemas/BasicBuildInfoResponse'
             security: []
             parameters: []
 servers:

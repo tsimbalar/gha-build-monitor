@@ -1,5 +1,5 @@
 import { Controller, Get, Route } from '@tsoa/runtime';
-import { BasicBuildInfo } from '../api-types';
+import { BasicBuildInfoResponse } from '../api-types';
 
 @Route('basic')
 export class BasicBuildInfoController extends Controller {
@@ -12,7 +12,7 @@ export class BasicBuildInfoController extends Controller {
   }
 
   @Get('')
-  public async getBasicBuildInfo(): Promise<BasicBuildInfo> {
+  public async getBasicBuildInfo(): Promise<BasicBuildInfoResponse> {
     return {
       protocol: 'https://catlight.io/protocol/v1.0/basic',
       id: this.serverId,

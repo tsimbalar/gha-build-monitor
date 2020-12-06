@@ -1,10 +1,10 @@
 import { Controller, Get, Route } from '@tsoa/runtime';
-import { BasicBuildInfo } from '../api-types';
+import { BasicBuildInfoResponse } from '../api-types';
 
 @Route('examples')
 export class ExampleController extends Controller {
   @Get('basic/basic')
-  public async getBasicExample(): Promise<BasicBuildInfo> {
+  public async getBasicExample(): Promise<BasicBuildInfoResponse> {
     return {
       protocol: 'https://catlight.io/protocol/v1.0/basic',
       id: 'myAwesomeServer/12345678-1234-4567-abcd-123456789abc',
@@ -83,7 +83,7 @@ export class ExampleController extends Controller {
   }
 
   @Get('basic/multi-space')
-  public async getBasicMultispaceExample(): Promise<BasicBuildInfo> {
+  public async getBasicMultispaceExample(): Promise<BasicBuildInfoResponse> {
     return {
       protocol: 'https://catlight.io/protocol/v1.0/basic',
       id: 'myAwesomeServer/12345678-1234-4567-abcd-123456789abc',

@@ -1,5 +1,5 @@
 import { ApiTestTools, TestAgent } from '../__testTools__/ApiTestTools';
-import { BasicBuildInfo } from '../api-types';
+import { BasicBuildInfoResponse } from '../api-types';
 
 describe('/examples', () => {
   describe('GET /examples/basic/basic', () => {
@@ -9,7 +9,7 @@ describe('/examples', () => {
       expect(response.status).toBe(200);
       expect(response.type).toBe('application/json');
 
-      const body = response.body as BasicBuildInfo;
+      const body = response.body as BasicBuildInfoResponse;
       expect(body.protocol).toBe('https://catlight.io/protocol/v1.0/basic');
     });
   });
@@ -21,7 +21,7 @@ describe('/examples', () => {
       expect(response.status).toBe(200);
       expect(response.type).toBe('application/json');
 
-      const body = response.body as BasicBuildInfo;
+      const body = response.body as BasicBuildInfoResponse;
       expect(body.protocol).toBe('https://catlight.io/protocol/v1.0/basic');
     });
   });

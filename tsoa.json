@@ -7,12 +7,21 @@
     "spec": {
         "outputDirectory": "docs",
         "specVersion": 3,
-        "yaml": true
+        "yaml": true,
+        "securityDefinitions": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Bearer authentication - give access to the bearer of this token",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
     },
     "routes": {
         "routesDir": "src/api",
         "routesFileName": "tsoa-routes.generated.ts",
-        "iocModule": "src/api/tsoa-ioc"
+        "iocModule": "src/api/tsoa-ioc",
+        "authenticationModule": "src/api/tsoa-auth"
     },
     "ignore": [
         "**/node_modules/**"

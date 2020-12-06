@@ -1,9 +1,9 @@
-import { ConstructorFunction, IControllerFactory } from './infra/IControllerFactory';
+import { ConstructorFunction, IControllerFactory } from './api/ioc/IControllerFactory';
 import { MetaInfo, meta as metaFromPackageJson } from './meta';
 import { BasicBuildInfoController } from './api/controllers/BasicBuildInfoController';
 import { Controller } from '@tsoa/runtime';
+import { DiagnosticsController } from './api/controllers/DiagnosticsController';
 import { ExampleController } from './api/controllers/ExampleController';
-import { HealthCheckController } from './api/controllers/HealthCheckController';
 import { Settings } from './settings-types';
 
 const SERVER_PREFIX = 'gha-build-monitor';
@@ -26,8 +26,8 @@ export class CompositionRoot implements IControllerFactory {
           SERVER_NAME,
           this.meta.version
         );
-      case HealthCheckController.name:
-        return new HealthCheckController(this.meta);
+      case DiagnosticsController.name:
+        return new DiagnosticsController(this.meta);
       default:
         // eslint-disable-next-line no-console
         console.error('Cannot create an instance of ', controllerConstructor);
