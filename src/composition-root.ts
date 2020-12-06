@@ -1,10 +1,10 @@
 import { ConstructorFunction, IControllerFactory } from './infra/IControllerFactory';
-import { MetaInfo, meta as metaFromPackageJson } from '../meta';
-import { BasicBuildInfoController } from './controllers/BasicBuildInfoController';
+import { MetaInfo, meta as metaFromPackageJson } from './meta';
+import { BasicBuildInfoController } from './api/controllers/BasicBuildInfoController';
 import { Controller } from '@tsoa/runtime';
-import { ExampleController } from './controllers/ExampleController';
-import { HealthCheckController } from './controllers/HealthCheckController';
-import { Settings } from '../settings-types';
+import { ExampleController } from './api/controllers/ExampleController';
+import { HealthCheckController } from './api/controllers/HealthCheckController';
+import { Settings } from './settings-types';
 
 const SERVER_PREFIX = 'gha-build-monitor';
 const SERVER_NAME = 'gha-build-monitor';

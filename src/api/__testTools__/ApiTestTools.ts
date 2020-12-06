@@ -1,7 +1,7 @@
-import { CompositionRoot } from '../api/composition-root';
+import { CompositionRoot } from '../../composition-root';
 import { Express } from 'express';
-import { Settings } from '../settings-types';
-import { buildWebApp } from '../api/server';
+import { Settings } from '../../settings-types';
+import { buildWebApp } from '../server';
 import supertest from 'supertest';
 
 export type TestAgent = supertest.SuperTest<supertest.Test>;

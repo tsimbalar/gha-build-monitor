@@ -1,5 +1,5 @@
 import { ApiTestTools, TestAgent } from '../__testTools__/ApiTestTools';
-import { HealthCheckSummaryResponse } from '../api/api-types';
+import { HealthCheckSummaryResponse } from '../api-types';
 
 describe('Public API /healthcheck', () => {
   describe('GET /healthcheck', () => {

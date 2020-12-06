@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import express, { Express } from 'express';
-import { CompositionRoot } from './composition-root';
+import { CompositionRoot } from '../composition-root';
 import { RegisterControllerFactory } from './tsoa-ioc';
 import { RegisterRoutes } from './tsoa-routes.generated';
 import swaggerUi from 'swagger-ui-express';

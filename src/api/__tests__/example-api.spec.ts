@@ -1,5 +1,5 @@
 import { ApiTestTools, TestAgent } from '../__testTools__/ApiTestTools';
-import { BasicBuildInfo } from '../api/api-types';
+import { BasicBuildInfo } from '../api-types';
 
 describe('/examples', () => {
   describe('GET /examples/basic/basic', () => {

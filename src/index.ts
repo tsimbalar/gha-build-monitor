@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { CompositionRoot } from './api/composition-root';
+import { CompositionRoot } from './composition-root';
 import { buildWebApp } from './api/server';
 import { loadSettingsFromEnvVars } from './settings';
 

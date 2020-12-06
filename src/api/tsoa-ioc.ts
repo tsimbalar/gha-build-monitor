@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 // needed for tsoa to know how to create controller instances
 
-import { ConstructorFunction, IControllerFactory } from './infra/IControllerFactory';
+import { ConstructorFunction, IControllerFactory } from '../infra/IControllerFactory';
 import { IocContainer } from '@tsoa/runtime';
 
 class IocContainerAdapter implements IocContainer {
