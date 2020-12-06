@@ -13,14 +13,23 @@ describe('/basic', () => {
       expect(body.protocol).toBe('https://catlight.io/protocol/v1.0/basic');
     });
 
+    test('should identify server as gha-build-monitor', async () => {
+      const agent = createTestAgent();
+      const response = await agent.get('/basic').send();
+
+      const body = response.body as BasicBuildInfo;
+      expect(body.id).toMatch(/^gha-build-monitor.*/u);
+      expect(body.name).toEqual('gha-build-monitor');
+      expect(body.serverVersion).toMatch(/[0-9]+.[0-9]+.[0-9]+/u);
+    });
+
     test('should have installationId in server id', async () => {
       const installationId = 'this_is_some_stuff';
       const agent = createTestAgent(installationId);
       const response = await agent.get('/basic').send();
 
       const body = response.body as BasicBuildInfo;
-      expect(body.id).toMatch(/^gha-build-monitor.*/u);
-      expect(body.id).toMatch(installationId);
+      expect(body.id).toMatch(RegExp(`${installationId}$`, 'u'));
     });
   });
 });
