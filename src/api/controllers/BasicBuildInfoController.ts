@@ -3,11 +3,15 @@ import { BasicBuildInfo } from '../api-types';
 
 @Route('basic')
 export class BasicBuildInfoController extends Controller {
+  public constructor(private readonly serverId: string) {
+    super();
+  }
+
   @Get('')
   public async getBasicBuildInfo(): Promise<BasicBuildInfo> {
     return {
       protocol: 'https://catlight.io/protocol/v1.0/basic',
-      id: 'myAwesomeServer/12345678-1234-4567-abcd-123456789abc',
+      id: this.serverId,
       webUrl: 'http://myserver.example/dashboard',
       name: 'My Server',
       currentUser: {

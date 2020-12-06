@@ -7,7 +7,7 @@
     "check": "npm run ts:check && npm run lint",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "start": "node dist/index.js",
+    "start": "INSTALLATION_ID=installation_id_guid node dist/index.js",
     "start:dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
     "test": "jest",
     "ts:check": "tsc --noEmit --noErrorTruncation ",

@@ -11,7 +11,8 @@
     },
     "routes": {
         "routesDir": "src/api",
-        "routesFileName": "tsoa-routes.generated.ts"
+        "routesFileName": "tsoa-routes.generated.ts",
+        "iocModule": "src/api/tsoa-ioc"
     },
     "ignore": [
         "**/node_modules/**"

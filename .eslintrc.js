@@ -29,5 +29,10 @@ module.exports = {
     'no-undefined': 'off',
     'no-use-before-define': 'off',
     'no-magic-numbers': 'off',
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    'no-inline-comments': 'off',
+    'line-comment-position': 'off',
   },
 };

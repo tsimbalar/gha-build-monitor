@@ -1,7 +1,11 @@
 /* eslint-disable no-console */
+import { CompositionRoot } from './api/composition-root';
 import { buildWebApp } from './api/server';
+import { loadSettingsFromEnvVars } from './settings';
 
-const app = buildWebApp();
+const settings = loadSettingsFromEnvVars();
+const compositionRoot = new CompositionRoot(settings);
+const app = buildWebApp(compositionRoot);
 
 const port = 9901;
 
