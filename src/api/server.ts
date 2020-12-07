@@ -6,12 +6,10 @@ import {
   httpErrorsJsonErrorHandler,
   logErrorHandler,
 } from './middleware/error-handling';
-import { BearerAuthenticationProvider } from './auth/BearerAuthenticationProvider';
 import { CompositionRoot } from '../composition-root';
 import { RegisterAuth } from './tsoa-auth';
 import { RegisterControllerFactory } from './tsoa-ioc';
 import { RegisterRoutes } from './tsoa-routes.generated';
-import { TsoaAuthentication } from './auth/TsoaAuthentication';
 import { schemaValidationErrorHandler } from './middleware/schema-validation';
 import swaggerUi from 'swagger-ui-express';
 import { timeAndLogHttpRequests } from './middleware/request-logging';
@@ -41,7 +39,7 @@ export function buildWebApp(compositionRoot: CompositionRoot): Express {
 
   RegisterControllerFactory(compositionRoot);
   RegisterRoutes(app);
-  RegisterAuth(new TsoaAuthentication([new BearerAuthenticationProvider()]));
+  RegisterAuth(compositionRoot.getAuthentication());
 
   // -- ERROR HANDLING --
   // (must be at the end)

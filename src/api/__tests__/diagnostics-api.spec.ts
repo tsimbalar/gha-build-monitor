@@ -1,14 +1,15 @@
 import { ApiTestTools, TestAgent } from '../__testTools__/ApiTestTools';
 import { HealthCheckResponse, WhoAmIResponse } from '../api-types';
-
-// Personal Access Token with no scope
-const MINIMAL_PRIVILEGE_GITHUB_TOKEN = 'b98fcc278378051761414236ad1c5a2a741cd313';
+import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
+import { User } from '../../domain/IUserRepository';
 
 describe('Public API /_/* (diagnostics)', () => {
   let agent: TestAgent;
+  let userRepo: InMemoryUserRepository;
 
   beforeEach(() => {
-    agent = ApiTestTools.createTestAgent();
+    userRepo = new InMemoryUserRepository();
+    agent = ApiTestTools.createTestAgent({ userRepo });
   });
 
   describe('GET /_/healthcheck', () => {
@@ -34,16 +35,28 @@ describe('Public API /_/* (diagnostics)', () => {
       expect(response.type).toBe('application/json');
     });
 
-    test('should return expected body with 200 status when provided bearer token', async () => {
+    test('should return 401 status when token does not match known user', async () => {
       const response = await agent
         .get('/_/whoami')
-        .set('Authorization', `Bearer ${MINIMAL_PRIVILEGE_GITHUB_TOKEN}`)
+        .set('Authorization', `Bearer some_token_from_somewhere`)
         .send();
+      expect(response.status).toBe(401);
+      expect(response.type).toBe('application/json');
+    });
+
+    test('should return expected body with 200 status when provided bearer token', async () => {
+      const existingUser: User = {
+        id: 'some_id',
+        login: 'the_login',
+      };
+      const token = 'THIS-IS-A-TOKEN';
+      userRepo.addUser(token, existingUser);
+      const response = await agent.get('/_/whoami').set('Authorization', `Bearer ${token}`).send();
       expect(response.status).toBe(200);
       expect(response.type).toBe('application/json');
       expect(response.body).toEqual<WhoAmIResponse>({
-        id: '160544',
-        name: 'tsimbalar',
+        id: existingUser.id,
+        name: existingUser.login,
       });
     });
   });

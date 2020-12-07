@@ -4,7 +4,7 @@
 /**
  * @see https://github.com/catlightio/catlight-protocol#user
  */
-interface User {
+export interface User {
   /**
    * Display name
    */

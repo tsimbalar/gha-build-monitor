@@ -5,7 +5,7 @@ import { buildWebApp } from './api/server';
 import { loadSettingsFromEnvVars } from './settings';
 
 const settings = loadSettingsFromEnvVars();
-const compositionRoot = new CompositionRoot(settings);
+const compositionRoot = CompositionRoot.forProd(settings);
 const app = buildWebApp(compositionRoot);
 
 const port = 9901;

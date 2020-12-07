@@ -210,7 +210,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BasicBuildInfoResponse'
-            security: []
+            security:
+                -
+                    bearerAuth: []
             parameters: []
     /_/healthcheck:
         get:

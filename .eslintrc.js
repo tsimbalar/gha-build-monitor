@@ -42,5 +42,7 @@ module.exports = {
     'prefer-destructuring': 'off',
     '@typescript-eslint/no-explicit-any': 'off' /* default is warn */,
     'init-declarations': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'id-length': 'off',
   },
 };

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { IAuthenticatedUser } from './IAuthentication';
 import { IAuthenticationProvider } from './IAuthenticationProvider';
-import { Octokit } from '@octokit/rest';
+import { IUserRepository } from '../../domain/IUserRepository';
 import { Request } from 'express';
 
 // Note: express http converts all headers
@@ -12,6 +12,8 @@ const AUTH_SCHEME_REGEX = /(?<scheme>\S+) +(?<value>\S+)/u;
 
 export class BearerAuthenticationProvider implements IAuthenticationProvider {
   public readonly securityScheme = 'bearerAuth';
+
+  public constructor(private readonly users: IUserRepository) {}
 
   public async getAuthenticatedUser(request: Request): Promise<IAuthenticatedUser | null> {
     const token = this.getBearerTokenFromRequest(request);
@@ -45,15 +47,11 @@ export class BearerAuthenticationProvider implements IAuthenticationProvider {
   }
 
   private async getUserInfoFromGitHub(token: string): Promise<IAuthenticatedUser> {
-    const gitHubClient = new Octokit({
-      auth: token,
-    });
-
-    const response = await gitHubClient.users.getAuthenticated({});
+    const user = await this.users.getUserFromToken(token);
 
     return {
-      id: response.data.id.toString(),
-      name: response.data.login,
+      id: user.id,
+      name: user.login,
       token,
     };
   }

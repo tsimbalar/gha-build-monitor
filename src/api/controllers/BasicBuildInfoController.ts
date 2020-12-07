@@ -1,28 +1,44 @@
-import { Controller, Get, Route } from '@tsoa/runtime';
+import * as catlight from '../catlight-protocol';
+import * as express from 'express';
+import { Controller, Get, Request, Route, Security } from '@tsoa/runtime';
 import { BasicBuildInfoResponse } from '../api-types';
 
+interface ServerInfo {
+  readonly id: string;
+  readonly name: string;
+  readonly version: string;
+}
 @Route('basic')
 export class BasicBuildInfoController extends Controller {
-  public constructor(
-    private readonly serverId: string,
-    private readonly serverName: string,
-    private serverVersion: string
-  ) {
+  public constructor(private readonly serverInfo: ServerInfo) {
     super();
   }
 
   @Get('')
-  public async getBasicBuildInfo(): Promise<BasicBuildInfoResponse> {
+  @Security('bearerAuth')
+  public async getBasicBuildInfo(
+    @Request() request: express.Request
+  ): Promise<BasicBuildInfoResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const currentUser = request.user!;
+    const userResponse: catlight.User = { name: currentUser.name, id: currentUser.id };
+
+    // const gitHubClient = this.githubFactory.getForToken(currentUser.token);
+
+    // const reposResponse = await gitHubClient.repos.listForAuthenticatedUser({
+    //   sort: 'full_name',
+    //   direction: 'asc',
+    // });
+
+    // const spaces = reposResponse.data.
+
     return {
       protocol: 'https://catlight.io/protocol/v1.0/basic',
-      id: this.serverId,
-      name: this.serverName,
-      serverVersion: this.serverVersion,
+      id: this.serverInfo.id,
+      name: this.serverInfo.name,
+      serverVersion: this.serverInfo.version,
       webUrl: 'http://myserver.example/dashboard',
-      currentUser: {
-        id: 'tim95',
-        name: 'Tim Drake',
-      },
+      currentUser: userResponse,
       spaces: [
         {
           id: 'super-project',
