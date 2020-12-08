@@ -14,6 +14,7 @@ export class InMemoryUserRepository implements IUserRepository {
     return {
       id: storedUser.id,
       login: storedUser.login,
+      scopes: storedUser.scopes,
     };
   }
 

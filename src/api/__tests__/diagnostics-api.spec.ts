@@ -48,6 +48,7 @@ describe('Public API /_/* (diagnostics)', () => {
       const existingUser: User = {
         id: 'some_id',
         login: 'the_login',
+        scopes: ['repo'],
       };
       const token = 'THIS-IS-A-TOKEN';
       userRepo.addUser(token, existingUser);
@@ -57,6 +58,7 @@ describe('Public API /_/* (diagnostics)', () => {
       expect(response.body).toEqual<WhoAmIResponse>({
         id: existingUser.id,
         name: existingUser.login,
+        scopes: existingUser.scopes,
       });
     });
   });

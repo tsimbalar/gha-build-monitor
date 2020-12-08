@@ -4,7 +4,7 @@ import { octokitFactory } from '../OctokitFactory';
 import { testCredentials } from '../__testTools__/TestCredentials';
 
 describe('RepoRepository', () => {
-  describe('getUserFromToken', () => {
+  describe('listForToken', () => {
     test('should return only public repos when using "no scope" token', async () => {
       const sut = new RepoRepository(octokitFactory);
 
@@ -19,6 +19,14 @@ describe('RepoRepository', () => {
         id: '318302976',
         name: 'tsimbalar/gha-build-monitor',
         webUrl: 'https://github.com/tsimbalar/gha-build-monitor',
+        workflows: [
+          {
+            id: '4055612',
+            name: 'Main',
+            webUrl:
+              'https://api.github.com/repos/tsimbalar/gha-build-monitor/actions/workflows/4055612',
+          },
+        ],
       });
 
       const regex = /^tsimbalar\/.*$/u;
@@ -42,15 +50,26 @@ describe('RepoRepository', () => {
         id: '318302976',
         name: 'tsimbalar/gha-build-monitor',
         webUrl: 'https://github.com/tsimbalar/gha-build-monitor',
+        workflows: [
+          {
+            id: '4055612',
+            name: 'Main',
+            webUrl:
+              'https://api.github.com/repos/tsimbalar/gha-build-monitor/actions/workflows/4055612',
+          },
+        ],
       });
 
       const ownedByTsimbalarRegexp = /^tsimbalar\/.*$/u;
-      const spacesWithouTsimbalar = actual.filter((s) => !ownedByTsimbalarRegexp.exec(s.name));
-      expect(spacesWithouTsimbalar).not.toHaveLength(0);
+      const spacesWithoutTsimbalar = actual.filter((s) => !ownedByTsimbalarRegexp.exec(s.name));
+      expect(spacesWithoutTsimbalar).not.toHaveLength(0);
 
       const ownedBySerilogRegexp = /^serilog\/.*$/u;
       const spacesOwnedBySerilog = actual.filter((s) => ownedBySerilogRegexp.exec(s.name));
       expect(spacesOwnedBySerilog).not.toHaveLength(0);
+
+      const spacesWithWorkflows = spacesWithoutTsimbalar.filter((s) => s.workflows.length > 0);
+      expect(spacesWithWorkflows).not.toHaveLength(0);
     }, 20000 /* this may take a while */);
   });
 });

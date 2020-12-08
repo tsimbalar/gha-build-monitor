@@ -1,8 +1,7 @@
-import { IAuthenticatedUser } from '../api/auth/IAuthentication';
-
 export interface User {
   readonly login: string;
   readonly id: string;
+  readonly scopes: string[];
 }
 
 export interface IUserRepository {

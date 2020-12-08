@@ -4,6 +4,7 @@ export interface IAuthenticatedUser {
   readonly id: string;
   readonly name: string;
   readonly token: string;
+  readonly tokenScopes: string[];
 }
 
 export interface IAuthentication {

@@ -19,7 +19,7 @@ export class BasicBuildInfoController extends Controller {
   }
 
   @Get('')
-  @Security('bearerAuth')
+  @Security('bearerAuth', ['repo'])
   public async getBasicBuildInfo(
     @Request() request: express.Request
   ): Promise<BasicBuildInfoResponse> {

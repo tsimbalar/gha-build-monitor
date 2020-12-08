@@ -13,6 +13,19 @@ describe('UserRepository', () => {
       expect(actual).toEqual<User>({
         id: '160544',
         login: 'tsimbalar',
+        scopes: [],
+      });
+    });
+
+    test('should return scopes of user with "repo" scope', async () => {
+      const sut = new UserRepository(octokitFactory);
+
+      const actual = await sut.getUserFromToken(testCredentials.PAT_SCOPE_REPO);
+
+      expect(actual).toEqual<User>({
+        id: '160544',
+        login: 'tsimbalar',
+        scopes: ['repo'],
       });
     });
 

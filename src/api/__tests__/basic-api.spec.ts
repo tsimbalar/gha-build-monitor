@@ -14,9 +14,22 @@ describe('/basic', () => {
       expect(response.type).toBe('application/json');
     });
 
+    test('should return a 403 status code when token misses "repo" scope', async () => {
+      const token = 'THIS_IS_THE_TOKEN';
+      const user: User = { id: 'USER_ID', login: 'USER_LOGIN', scopes: [] };
+      const userRepo = new InMemoryUserRepository();
+      userRepo.addUser(token, user);
+
+      const agent = ApiTestTools.createTestAgent({ userRepo });
+
+      const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
+      expect(response.status).toBe(403);
+      expect(response.type).toBe('application/json');
+    });
+
     describe('with token of existing user', () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: User = { id: 'USER_ID', login: 'USER_LOGIN' };
+      const user: User = { id: 'USER_ID', login: 'USER_LOGIN', scopes: ['repo'] };
       const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;
@@ -70,9 +83,9 @@ describe('/basic', () => {
 
       test('should return spaces of user', async () => {
         const repos: Repo[] = [
-          { id: '123', name: 'orgx/repoz', webUrl: '' },
-          { id: '456', name: 'org1/repoB', webUrl: '' },
-          { id: '789', name: 'orgx/repoa', webUrl: '' },
+          { id: '123', name: 'orgx/repoz', webUrl: '', workflows: [] },
+          { id: '456', name: 'org1/repoB', webUrl: '', workflows: [] },
+          { id: '789', name: 'orgx/repoa', webUrl: '', workflows: [] },
         ];
         repos.forEach((r) => repoRepo.addRepo(r));
         const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();

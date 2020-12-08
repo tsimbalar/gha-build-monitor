@@ -20,7 +20,7 @@ export class TsoaAuthentication implements IAuthentication {
     for (const supportedProvider of this.providers) {
       if (supportedProvider.securityScheme === securitySchemeName) {
         // eslint-disable-next-line no-await-in-loop
-        const user = await this.doAuthentication(supportedProvider, request);
+        const user = await this.doAuthentication(supportedProvider, request, scopes);
         if (user !== null) {
           return user;
         }
@@ -32,7 +32,8 @@ export class TsoaAuthentication implements IAuthentication {
 
   private async doAuthentication(
     provider: IAuthenticationProvider,
-    request: Request
+    request: Request,
+    scopes?: string[]
   ): Promise<IAuthenticatedUser | null> {
     let authenticatedUser: IAuthenticatedUser | null = null;
     try {
@@ -51,7 +52,33 @@ export class TsoaAuthentication implements IAuthentication {
       throw new Errors.UnauthorizedError();
     }
 
+    this.ensureUserIsAuthorized(authenticatedUser, scopes);
+
     console.debug('Request was authenticated');
     return authenticatedUser; // will be assigned to request.user
+  }
+
+  private ensureUserIsAuthorized(
+    authenticatedUser: IAuthenticatedUser,
+    requiredScopes?: string[]
+  ): void {
+    if (requiredScopes && requiredScopes.length > 0) {
+      const foundMatchingScopes: string[] = [];
+      for (const requiredScope of requiredScopes) {
+        if (authenticatedUser.tokenScopes.includes(requiredScope)) {
+          foundMatchingScopes.push(requiredScope);
+        }
+      }
+
+      if (foundMatchingScopes.length !== requiredScopes.length) {
+        console.warn(
+          `Request could not be authorized for scopes [${requiredScopes}]. User has scopes : [${authenticatedUser.tokenScopes}]. Matched [${foundMatchingScopes}]`
+        );
+        throw new Errors.ForbiddenError();
+      }
+      console.debug(
+        `Request authorized for roles [${requiredScopes}]. User has scopes : [${authenticatedUser.tokenScopes}]. Matched [${foundMatchingScopes}]`
+      );
+    }
   }
 }

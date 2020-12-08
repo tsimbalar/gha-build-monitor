@@ -9,9 +9,14 @@ export class UserRepository implements IUserRepository {
 
     const response = await octokit.users.getAuthenticated({});
 
+    const userScopes = (response.headers['x-oauth-scopes'] ?? '')
+      .split(',')
+      .filter((x) => x !== '');
+
     return {
       id: response.data.id.toString(),
       login: response.data.login,
+      scopes: userScopes,
     };
   }
 }

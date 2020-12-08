@@ -179,9 +179,14 @@ components:
                     type: string
                 name:
                     type: string
+                scopes:
+                    items:
+                        type: string
+                    type: array
             required:
                 - id
                 - name
+                - scopes
             type: object
             additionalProperties: false
     securitySchemes:
@@ -212,7 +217,8 @@ paths:
                                 $ref: '#/components/schemas/BasicBuildInfoResponse'
             security:
                 -
-                    bearerAuth: []
+                    bearerAuth:
+                        - repo
             parameters: []
     /_/healthcheck:
         get:

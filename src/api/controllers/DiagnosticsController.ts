@@ -31,6 +31,7 @@ export class DiagnosticsController extends Controller {
     return {
       id: currentUser.id,
       name: currentUser.name,
+      scopes: currentUser.tokenScopes,
     };
   }
 }
