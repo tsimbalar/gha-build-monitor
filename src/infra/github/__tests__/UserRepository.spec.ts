@@ -1,16 +1,14 @@
 import { User } from '../../../domain/IUserRepository';
 import { UserRepository } from '../UserRepository';
 import { octokitFactory } from '../OctokitFactory';
-
-// Personal Access Token with no scope
-const MINIMAL_PRIVILEGE_GITHUB_TOKEN = 'b98fcc278378051761414236ad1c5a2a741cd313';
+import { testCredentials } from '../__testTools__/TestCredentials';
 
 describe('UserRepository', () => {
   describe('getUserFromToken', () => {
     test('should return user info with valid token', async () => {
       const sut = new UserRepository(octokitFactory);
 
-      const actual = await sut.getUserFromToken(MINIMAL_PRIVILEGE_GITHUB_TOKEN);
+      const actual = await sut.getUserFromToken(testCredentials.PAT_NO_SCOPE);
 
       expect(actual).toEqual<User>({
         id: '160544',

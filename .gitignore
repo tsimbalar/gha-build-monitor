@@ -105,3 +105,5 @@ dist
 
 # tsoa generated stuff
 src/api/tsoa-routes.generated.ts
+
+src/infra/github/__testTools__/secrets.ts

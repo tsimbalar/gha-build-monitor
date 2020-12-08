@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-18.04
+    env:
+      # some tests need credentials when hitting github endpoints - see src/infra/github/__testTools__/secrets.ts.sample
+      TEST_CREDENTIALS: ${{ secrets.TEST_CREDENTIALS }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
