@@ -130,7 +130,7 @@ interface BuildDefinition {
  *
  * @see https://github.com/catlightio/catlight-protocol#space
  */
-interface Space {
+export interface Space {
   /**
    * Space id should be unique on the server.
    */

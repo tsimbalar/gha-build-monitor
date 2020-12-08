@@ -1,6 +1,8 @@
 import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTestTools';
 import { BasicBuildInfoResponse } from '../api-types';
+import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
+import { Repo } from '../../domain/IRepoRepository';
 import { User } from '../../domain/IUserRepository';
 
 describe('/basic', () => {
@@ -17,13 +19,16 @@ describe('/basic', () => {
       const user: User = { id: 'USER_ID', login: 'USER_LOGIN' };
       const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
+      let repoRepo: InMemoryRepoRepository;
 
       beforeEach(() => {
         const userRepo = new InMemoryUserRepository();
         userRepo.addUser(token, user);
 
+        repoRepo = new InMemoryRepoRepository();
+
         agent = ApiTestTools.createTestAgent(
-          { userRepo },
+          { userRepo, repoRepo },
           {
             ...TEST_SETTINGS,
             catlight: { ...TEST_SETTINGS.catlight, installationId },
@@ -61,6 +66,19 @@ describe('/basic', () => {
 
         const body = response.body as BasicBuildInfoResponse;
         expect(body.currentUser).toEqual({ id: user.id, name: user.login });
+      });
+
+      test('should return spaces of user', async () => {
+        const repos: Repo[] = [
+          { id: '123', name: 'orgx/repoz', webUrl: '' },
+          { id: '456', name: 'org1/repoB', webUrl: '' },
+          { id: '789', name: 'orgx/repoa', webUrl: '' },
+        ];
+        repos.forEach((r) => repoRepo.addRepo(r));
+        const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
+
+        const body = response.body as BasicBuildInfoResponse;
+        expect(body.spaces).toHaveLength(repos.length);
       });
     });
   });

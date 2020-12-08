@@ -6,7 +6,9 @@ import { Controller } from '@tsoa/runtime';
 import { DiagnosticsController } from './api/controllers/DiagnosticsController';
 import { ExampleController } from './api/controllers/ExampleController';
 import { IAuthentication } from './api/auth/IAuthentication';
+import { IRepoRepository } from './domain/IRepoRepository';
 import { IUserRepository } from './domain/IUserRepository';
+import { RepoRepository } from './infra/github/RepoRepository';
 import { Settings } from './settings-types';
 import { TsoaAuthentication } from './api/auth/TsoaAuthentication';
 import { UserRepository } from './infra/github/UserRepository';
@@ -15,19 +17,35 @@ import { octokitFactory } from './infra/github/OctokitFactory';
 const SERVER_PREFIX = 'gha-build-monitor';
 const SERVER_NAME = 'gha-build-monitor';
 
+export interface ApiDependencies {
+  readonly userRepo: IUserRepository;
+  readonly repoRepo: IRepoRepository;
+}
+
 export class CompositionRoot implements IControllerFactory {
   private constructor(
     private readonly settings: Settings,
     private readonly meta: MetaInfo,
-    private readonly userRepo: IUserRepository
+    private readonly userRepo: IUserRepository,
+    private readonly repoRepo: IRepoRepository
   ) {}
 
   public static forProd(settings: Settings): CompositionRoot {
-    return new CompositionRoot(settings, metaFromPackageJson, new UserRepository(octokitFactory));
+    return new CompositionRoot(
+      settings,
+      metaFromPackageJson,
+      new UserRepository(octokitFactory),
+      new RepoRepository(octokitFactory)
+    );
   }
 
-  public static forTesting(settings: Settings, userRepo: IUserRepository): CompositionRoot {
-    return new CompositionRoot(settings, metaFromPackageJson, userRepo);
+  public static forTesting(settings: Settings, dependencies: ApiDependencies): CompositionRoot {
+    return new CompositionRoot(
+      settings,
+      metaFromPackageJson,
+      dependencies.userRepo,
+      dependencies.repoRepo
+    );
   }
 
   public get<T>(controllerConstructor: ConstructorFunction<T>): Controller {
@@ -35,11 +53,14 @@ export class CompositionRoot implements IControllerFactory {
       case ExampleController.name:
         return new ExampleController();
       case BasicBuildInfoController.name:
-        return new BasicBuildInfoController({
-          id: `${SERVER_PREFIX}/${this.settings.catlight.installationId}`,
-          name: SERVER_NAME,
-          version: this.meta.version,
-        });
+        return new BasicBuildInfoController(
+          {
+            id: `${SERVER_PREFIX}/${this.settings.catlight.installationId}`,
+            name: SERVER_NAME,
+            version: this.meta.version,
+          },
+          this.repoRepo
+        );
       case DiagnosticsController.name:
         return new DiagnosticsController(this.meta);
       default:

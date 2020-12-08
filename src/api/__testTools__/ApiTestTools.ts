@@ -1,6 +1,6 @@
-import { CompositionRoot } from '../../composition-root';
+import { ApiDependencies, CompositionRoot } from '../../composition-root';
 import { Express } from 'express';
-import { IUserRepository } from '../../domain/IUserRepository';
+import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
 import { Settings } from '../../settings-types';
 import { buildWebApp } from '../server';
@@ -14,21 +14,27 @@ export const TEST_SETTINGS: Settings = Object.freeze({
   },
 });
 
-export interface ApiDependencies {
-  userRepo?: IUserRepository;
+function getDependenciesForTesting(partial: Partial<ApiDependencies>): ApiDependencies {
+  return {
+    repoRepo: partial?.repoRepo ?? new InMemoryRepoRepository(),
+    userRepo: partial.userRepo ?? new InMemoryUserRepository(),
+  };
 }
 
 export class ApiTestTools {
-  private static createTestWebApp(settings: Settings, dependencies: ApiDependencies): Express {
+  private static createTestWebApp(
+    settings: Settings,
+    dependencies: Partial<ApiDependencies>
+  ): Express {
     const compositionRoot = CompositionRoot.forTesting(
       settings,
-      dependencies.userRepo ?? new InMemoryUserRepository()
+      getDependenciesForTesting(dependencies)
     );
     return buildWebApp(compositionRoot);
   }
 
   public static createTestAgent(
-    dependencies: ApiDependencies = {},
+    dependencies: Partial<ApiDependencies> = {},
     settings: Settings = TEST_SETTINGS
   ): TestAgent {
     return supertest.agent(ApiTestTools.createTestWebApp(settings, dependencies));
