@@ -14,5 +14,5 @@ export const THIS_REPO: Omit<Repo, 'workflows'> = {
 export const THIS_REPO_MAIN_WORKFLOW: Workflow = {
   id: '4055612',
   name: 'Main',
-  webUrl: 'https://api.github.com/repos/tsimbalar/gha-build-monitor/actions/workflows/4055612',
+  webUrl: 'https://github.com/tsimbalar/gha-build-monitor/blob/main/.github/workflows/main.yaml',
 };

@@ -48,7 +48,7 @@ export class RepoRepository implements IRepoRepository {
         const mappedWorkFlows = payload.map<Workflow>((w) => ({
           id: w.id.toString(),
           name: w.name,
-          webUrl: w.url,
+          webUrl: w.html_url,
         }));
 
         return [repo.fullName, mappedWorkFlows] as [string, Workflow[]];
