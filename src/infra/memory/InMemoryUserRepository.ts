@@ -1,11 +1,11 @@
-import { IUserRepository, User } from '../../domain/IUserRepository';
+import { IUserRepository, UserWithScopes } from '../../domain/IUserRepository';
 
-export type StoredUser = User & { readonly token: string };
+export type StoredUser = UserWithScopes & { readonly token: string };
 
 export class InMemoryUserRepository implements IUserRepository {
   private readonly users: StoredUser[] = [];
 
-  public async getUserFromToken(token: string): Promise<User> {
+  public async getUserFromToken(token: string): Promise<UserWithScopes> {
     const storedUser = this.users.find((u) => u.token === token);
     if (!storedUser) {
       throw new Error(`Could not find user with token ${token}`);
@@ -18,7 +18,7 @@ export class InMemoryUserRepository implements IUserRepository {
     };
   }
 
-  public addUser(token: string, user: User): void {
+  public addUser(token: string, user: UserWithScopes): void {
     this.users.push({ token, ...user });
   }
 }

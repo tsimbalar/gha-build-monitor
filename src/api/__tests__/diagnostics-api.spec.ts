@@ -1,7 +1,7 @@
 import { ApiTestTools, TestAgent } from '../__testTools__/ApiTestTools';
 import { HealthCheckResponse, WhoAmIResponse } from '../api-types';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
-import { User } from '../../domain/IUserRepository';
+import { UserWithScopes } from '../../domain/IUserRepository';
 
 describe('Public API /_/* (diagnostics)', () => {
   let agent: TestAgent;
@@ -45,7 +45,7 @@ describe('Public API /_/* (diagnostics)', () => {
     });
 
     test('should return expected body with 200 status when provided bearer token', async () => {
-      const existingUser: User = {
+      const existingUser: UserWithScopes = {
         id: 'some_id',
         login: 'the_login',
         scopes: ['repo'],

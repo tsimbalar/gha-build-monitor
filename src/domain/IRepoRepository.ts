@@ -1,3 +1,5 @@
+import { User } from './IUserRepository';
+
 export interface Repo {
   readonly id: string;
   readonly name: RepoName;
@@ -17,6 +19,14 @@ export class RepoName {
 
   public localeCompare(other: RepoName): number {
     return this.fullName.localeCompare(other.fullName);
+  }
+
+  public belongsTo(owner: User): boolean {
+    return this.owner === owner.login;
+  }
+
+  public equals(other: RepoName): boolean {
+    return this.fullName === other.fullName;
   }
 }
 

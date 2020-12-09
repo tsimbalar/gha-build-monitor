@@ -1,5 +1,6 @@
-import { User } from '../../../domain/IUserRepository';
+import { THIS_REPO_OWNER } from '../__testTools__/TestConstants';
 import { UserRepository } from '../UserRepository';
+import { UserWithScopes } from '../../../domain/IUserRepository';
 import { octokitFactory } from '../OctokitFactory';
 import { testCredentials } from '../__testTools__/TestCredentials';
 
@@ -10,9 +11,8 @@ describe('UserRepository', () => {
 
       const actual = await sut.getUserFromToken(testCredentials.PAT_NO_SCOPE);
 
-      expect(actual).toEqual<User>({
-        id: '160544',
-        login: 'tsimbalar',
+      expect(actual).toEqual<UserWithScopes>({
+        ...THIS_REPO_OWNER,
         scopes: [],
       });
     });
@@ -22,9 +22,8 @@ describe('UserRepository', () => {
 
       const actual = await sut.getUserFromToken(testCredentials.PAT_SCOPE_REPO);
 
-      expect(actual).toEqual<User>({
-        id: '160544',
-        login: 'tsimbalar',
+      expect(actual).toEqual<UserWithScopes>({
+        ...THIS_REPO_OWNER,
         scopes: ['repo'],
       });
     });

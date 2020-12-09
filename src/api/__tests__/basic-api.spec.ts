@@ -4,7 +4,7 @@ import { RepoName, Workflow } from '../../domain/IRepoRepository';
 import { BasicBuildInfoResponse } from '../api-types';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
-import { User } from '../../domain/IUserRepository';
+import { UserWithScopes } from '../../domain/IUserRepository';
 
 describe('/basic', () => {
   describe('GET /basic', () => {
@@ -17,7 +17,7 @@ describe('/basic', () => {
 
     test('should return a 403 status code when token misses "repo" scope', async () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: User = { id: 'USER_ID', login: 'USER_LOGIN', scopes: [] };
+      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: [] };
       const userRepo = new InMemoryUserRepository();
       userRepo.addUser(token, user);
 
@@ -30,7 +30,7 @@ describe('/basic', () => {
 
     describe('with token of existing user', () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: User = { id: 'USER_ID', login: 'USER_LOGIN', scopes: ['repo'] };
+      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: ['repo'] };
       const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;

@@ -24,6 +24,7 @@
         "authenticationModule": "src/api/tsoa-auth"
     },
     "ignore": [
-        "**/node_modules/**"
+        "**/node_modules/**",
+        "**/domain/**"
     ]
 }
