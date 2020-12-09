@@ -1,4 +1,4 @@
-import { IRepoRepository, Repo, Workflow } from '../../domain/IRepoRepository';
+import { IRepoRepository, Repo, RepoName, Workflow } from '../../domain/IRepoRepository';
 import { Octokit } from '@octokit/rest';
 import { OctokitFactory } from './OctokitFactory';
 
@@ -22,12 +22,13 @@ export class RepoRepository implements IRepoRepository {
     const workflowsPerRepo = await this.getWorkflowsPerRepo(
       octokit,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      allRepos.map((r) => ({ name: r.name, owner: r.owner!.login, fullName: r.full_name }))
+      allRepos.map((r) => new RepoName(r.owner!.login, r.name))
     );
 
     return allRepos.map((r) => ({
       id: r.id.toString(),
-      name: r.full_name,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      name: new RepoName(r.owner!.login, r.name),
       webUrl: r.html_url,
       workflows: workflowsPerRepo.get(r.full_name) ?? [],
     }));
@@ -35,7 +36,7 @@ export class RepoRepository implements IRepoRepository {
 
   private async getWorkflowsPerRepo(
     octokit: Octokit,
-    repos: { fullName: string; name: string; owner: string }[]
+    repos: RepoName[]
   ): Promise<Map<string, Workflow[]>> {
     const allWorkFlows = await Promise.all(
       repos.map(async (repo) => {

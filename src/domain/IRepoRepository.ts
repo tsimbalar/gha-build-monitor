@@ -1,11 +1,23 @@
 export interface Repo {
   readonly id: string;
-  readonly name: string;
+  readonly name: RepoName;
   readonly webUrl: string;
   /**
    * null when we don't have permissions to retrieve workflows !
    */
   readonly workflows: ReadonlyArray<Workflow>;
+}
+
+export class RepoName {
+  public constructor(public readonly owner: string, public readonly name: string) {}
+
+  public get fullName(): string {
+    return `${this.owner}/${this.name}`;
+  }
+
+  public localeCompare(other: RepoName): number {
+    return this.fullName.localeCompare(other.fullName);
+  }
 }
 
 export interface Workflow {

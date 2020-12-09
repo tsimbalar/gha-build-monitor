@@ -47,12 +47,12 @@ export class BasicBuildInfoController extends Controller {
       currentUser: userResponse,
       spaces: repos.map((repo) => ({
         id: repo.id,
-        name: repo.name,
+        name: repo.name.fullName,
         webUrl: repo.webUrl,
         buildDefinitions: repo.workflows.map<catlight.BuildDefinition>((wf) => ({
           id: wf.id,
           name: wf.name,
-          folder: repo.name,
+          folder: repo.name.fullName,
           webUrl: wf.webUrl,
           branches: [
             {

@@ -1,10 +1,10 @@
 import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTestTools';
 import { BuildDefinition, Space } from '../catlight-protocol';
+import { RepoName, Workflow } from '../../domain/IRepoRepository';
 import { BasicBuildInfoResponse } from '../api-types';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
 import { User } from '../../domain/IUserRepository';
-import { Workflow } from '../../domain/IRepoRepository';
 
 describe('/basic', () => {
   describe('GET /basic', () => {
@@ -83,8 +83,8 @@ describe('/basic', () => {
       });
 
       test('should return spaces of user', async () => {
-        const repo1 = { id: '789', name: 'orgx/repoa', webUrl: '', workflows: [] };
-        const repo2 = { id: '123', name: 'orgx/repoz', webUrl: '', workflows: [] };
+        const repo1 = { id: '789', name: new RepoName('orgx', 'repoa'), webUrl: '', workflows: [] };
+        const repo2 = { id: '123', name: new RepoName('orgx', 'repoz'), webUrl: '', workflows: [] };
         repoRepo.addRepo(repo1);
         repoRepo.addRepo(repo2);
         const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
@@ -93,13 +93,13 @@ describe('/basic', () => {
         expect(body.spaces).toEqual<Space[]>([
           {
             id: repo1.id,
-            name: repo1.name,
+            name: repo1.name.fullName,
             webUrl: repo1.webUrl,
             buildDefinitions: expect.anything(),
           },
           {
             id: repo2.id,
-            name: repo2.name,
+            name: repo2.name.fullName,
             webUrl: repo2.webUrl,
             buildDefinitions: expect.anything(),
           },
@@ -117,10 +117,10 @@ describe('/basic', () => {
           name: 'workflow-name2',
           webUrl: 'http://www.perdu2.com',
         };
-        const repoFullName = 'orgx/repoz';
+        const repoName = new RepoName('orgx', 'repoz');
         repoRepo.addRepo({
           id: '123',
-          name: repoFullName,
+          name: repoName,
           webUrl: '',
           workflows: [workflow1, workflow2],
         });
@@ -133,7 +133,7 @@ describe('/basic', () => {
           {
             id: workflow1.id,
             name: workflow1.name,
-            folder: repoFullName,
+            folder: repoName.fullName,
             webUrl: workflow1.webUrl,
             branches: [
               {
@@ -145,7 +145,7 @@ describe('/basic', () => {
           {
             id: workflow2.id,
             name: workflow2.name,
-            folder: repoFullName,
+            folder: repoName.fullName,
             webUrl: workflow2.webUrl,
             branches: [
               {
