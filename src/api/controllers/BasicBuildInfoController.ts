@@ -45,11 +45,30 @@ export class BasicBuildInfoController extends Controller {
       serverVersion: this.serverInfo.version,
       webUrl: 'http://myserver.example/dashboard',
       currentUser: userResponse,
-      spaces: repos.map((s) => ({
-        id: s.id,
-        name: s.name,
-        webUrl: s.webUrl,
-        buildDefinitions: [],
+      spaces: repos.map((repo) => ({
+        id: repo.id,
+        name: repo.name,
+        webUrl: repo.webUrl,
+        buildDefinitions: repo.workflows.map<catlight.BuildDefinition>((wf) => ({
+          id: wf.id,
+          name: wf.name,
+          folder: repo.name,
+          webUrl: wf.webUrl,
+          branches: [
+            {
+              id: catlight.BRANCHES_ALL_ID,
+              builds: [
+                {
+                  id: wf.id,
+                  status: 'Succeeded',
+                  startTime: new Date(Date.parse('2017-01-25T17:30:10.000Z')),
+                  finishTime: new Date(Date.parse('2017-01-25T17:30:20.000Z')),
+                  triggeredByUser: userResponse,
+                },
+              ],
+            },
+          ],
+        })),
       })),
       // [
       // {

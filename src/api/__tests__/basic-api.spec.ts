@@ -1,9 +1,10 @@
 import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTestTools';
+import { BuildDefinition, Space } from '../catlight-protocol';
 import { BasicBuildInfoResponse } from '../api-types';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
-import { Repo } from '../../domain/IRepoRepository';
 import { User } from '../../domain/IUserRepository';
+import { Workflow } from '../../domain/IRepoRepository';
 
 describe('/basic', () => {
   describe('GET /basic', () => {
@@ -82,16 +83,78 @@ describe('/basic', () => {
       });
 
       test('should return spaces of user', async () => {
-        const repos: Repo[] = [
-          { id: '123', name: 'orgx/repoz', webUrl: '', workflows: [] },
-          { id: '456', name: 'org1/repoB', webUrl: '', workflows: [] },
-          { id: '789', name: 'orgx/repoa', webUrl: '', workflows: [] },
-        ];
-        repos.forEach((r) => repoRepo.addRepo(r));
+        const repo1 = { id: '789', name: 'orgx/repoa', webUrl: '', workflows: [] };
+        const repo2 = { id: '123', name: 'orgx/repoz', webUrl: '', workflows: [] };
+        repoRepo.addRepo(repo1);
+        repoRepo.addRepo(repo2);
         const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as BasicBuildInfoResponse;
-        expect(body.spaces).toHaveLength(repos.length);
+        expect(body.spaces).toEqual<Space[]>([
+          {
+            id: repo1.id,
+            name: repo1.name,
+            webUrl: repo1.webUrl,
+            buildDefinitions: expect.anything(),
+          },
+          {
+            id: repo2.id,
+            name: repo2.name,
+            webUrl: repo2.webUrl,
+            buildDefinitions: expect.anything(),
+          },
+        ]);
+      });
+
+      test('should return build definitions', async () => {
+        const workflow1: Workflow = {
+          id: 'worflow-id',
+          name: 'workflow-name',
+          webUrl: 'http://www.perdu.com',
+        };
+        const workflow2: Workflow = {
+          id: 'worflow-id2',
+          name: 'workflow-name2',
+          webUrl: 'http://www.perdu2.com',
+        };
+        const repoFullName = 'orgx/repoz';
+        repoRepo.addRepo({
+          id: '123',
+          name: repoFullName,
+          webUrl: '',
+          workflows: [workflow1, workflow2],
+        });
+        const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
+
+        const body = response.body as BasicBuildInfoResponse;
+        expect(body.spaces).toHaveLength(1);
+        const buildDefinitions = body.spaces[0].buildDefinitions;
+        expect(buildDefinitions).toEqual<BuildDefinition[]>([
+          {
+            id: workflow1.id,
+            name: workflow1.name,
+            folder: repoFullName,
+            webUrl: workflow1.webUrl,
+            branches: [
+              {
+                id: '~all',
+                builds: expect.anything(),
+              },
+            ],
+          },
+          {
+            id: workflow2.id,
+            name: workflow2.name,
+            folder: repoFullName,
+            webUrl: workflow2.webUrl,
+            branches: [
+              {
+                id: '~all',
+                builds: expect.anything(),
+              },
+            ],
+          },
+        ]);
       });
     });
   });

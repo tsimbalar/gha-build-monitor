@@ -2,6 +2,11 @@
 // See https://github.com/catlightio/catlight-protocol
 
 /**
+ * If your system cannot separate builds into branches, add a single branch to this array with id = "~all"
+ */
+export const BRANCHES_ALL_ID = '~all';
+
+/**
  * @see https://github.com/catlightio/catlight-protocol#user
  */
 export interface User {
@@ -91,7 +96,7 @@ interface BuildBranch {
 /**
  * @see https://github.com/catlightio/catlight-protocol#builddefinition
  */
-interface BuildDefinition {
+export interface BuildDefinition {
   /**
    * Id should be unique in parent space.
    */
