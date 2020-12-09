@@ -83,6 +83,8 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
           return 'Failed';
         }
         break;
+      case 'in_progress':
+        return 'Running';
       case 'queued':
         return 'Queued';
     }
