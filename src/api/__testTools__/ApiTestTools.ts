@@ -2,6 +2,7 @@ import { ApiDependencies, CompositionRoot } from '../../composition-root';
 import { Express } from 'express';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
+import { InMemoryWorkflowRunRepository } from '../../infra/memory/InMemoryWorkflowRunRepository';
 import { Settings } from '../../settings-types';
 import { buildWebApp } from '../server';
 import supertest from 'supertest';
@@ -18,6 +19,7 @@ function getDependenciesForTesting(partial: Partial<ApiDependencies>): ApiDepend
   return {
     repoRepo: partial?.repoRepo ?? new InMemoryRepoRepository(),
     userRepo: partial.userRepo ?? new InMemoryUserRepository(),
+    workflowRunRepo: partial.workflowRunRepo ?? new InMemoryWorkflowRunRepository(),
   };
 }
 

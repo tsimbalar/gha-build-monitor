@@ -44,5 +44,6 @@ module.exports = {
     'init-declarations': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
     'id-length': 'off',
+    'no-warning-comments': 'off',
   },
 };

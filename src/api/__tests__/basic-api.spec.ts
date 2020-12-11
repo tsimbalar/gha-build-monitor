@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTestTools';
 import { BuildDefinition, Space } from '../catlight-protocol';
 import { RepoName, Workflow } from '../../domain/IRepoRepository';
 import { BasicBuildInfoResponse } from '../api-types';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
+import { InMemoryWorkflowRunRepository } from '../../infra/memory/InMemoryWorkflowRunRepository';
 import { UserWithScopes } from '../../domain/IUserRepository';
+import { WorkflowRun } from '../../domain/IWorkflowRunRepository';
 
 describe('/basic', () => {
   describe('GET /basic', () => {
@@ -34,15 +37,17 @@ describe('/basic', () => {
       const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;
+      let workflowRunRepo: InMemoryWorkflowRunRepository;
 
       beforeEach(() => {
         const userRepo = new InMemoryUserRepository();
         userRepo.addUser(token, user);
 
         repoRepo = new InMemoryRepoRepository();
+        workflowRunRepo = new InMemoryWorkflowRunRepository();
 
         agent = ApiTestTools.createTestAgent(
-          { userRepo, repoRepo },
+          { userRepo, repoRepo, workflowRunRepo },
           {
             ...TEST_SETTINGS,
             catlight: { ...TEST_SETTINGS.catlight, installationId },
@@ -135,26 +140,74 @@ describe('/basic', () => {
             name: workflow1.name,
             folder: repoName.fullName,
             webUrl: workflow1.webUrl,
-            branches: [
-              {
-                id: '~all',
-                builds: expect.anything(),
-              },
-            ],
+            branches: [],
           },
           {
             id: workflow2.id,
             name: workflow2.name,
             folder: repoName.fullName,
             webUrl: workflow2.webUrl,
-            branches: [
-              {
-                id: '~all',
-                builds: expect.anything(),
-              },
-            ],
+            branches: [],
           },
         ]);
+      });
+
+      test('should return build branches', async () => {
+        const repoName = new RepoName('orgx', 'repoz');
+        const workflowId = 'worflow-id';
+        repoRepo.addRepo({
+          id: '123',
+          name: repoName,
+          webUrl: '',
+          workflows: [
+            {
+              id: workflowId,
+              name: 'workflow-name',
+              webUrl: 'http://www.perdu.com',
+            },
+          ],
+        });
+
+        const branch1 = 'master';
+        const branch1Runs: WorkflowRun[] = [
+          {
+            id: 'master1',
+            startTime: new Date(),
+            status: 'Queued',
+            webUrl: 'http://....',
+          },
+        ];
+
+        const branch2 = 'develop';
+        const branch2Runs: WorkflowRun[] = [
+          {
+            id: 'develop1',
+            startTime: new Date(),
+            status: 'Queued',
+            webUrl: 'http://....',
+          },
+        ];
+
+        workflowRunRepo.addRuns(repoName, workflowId, branch1, branch1Runs);
+        workflowRunRepo.addRuns(repoName, workflowId, branch2, branch2Runs);
+        const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
+
+        const body = response.body as BasicBuildInfoResponse;
+        expect(body.spaces).toHaveLength(1);
+        const buildDefinitions = body.spaces[0].buildDefinitions;
+        expect(buildDefinitions).toHaveLength(1);
+        const buildBranches = buildDefinitions[0].branches;
+        expect(buildBranches).toHaveLength(2);
+
+        const buildBranch1 = buildBranches.find((b) => b.id === branch1)!;
+        expect(buildBranch1).toBeDefined();
+        expect(buildBranch1.builds).toHaveLength(1);
+        expect(buildBranch1.builds[0].id).toBe('master1');
+
+        const buildBranch2 = buildBranches.find((b) => b.id === branch2)!;
+        expect(buildBranch2).toBeDefined();
+        expect(buildBranch2.builds).toHaveLength(1);
+        expect(buildBranch2.builds[0].id).toBe('develop1');
       });
     });
   });

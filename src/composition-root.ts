@@ -8,10 +8,12 @@ import { ExampleController } from './api/controllers/ExampleController';
 import { IAuthentication } from './api/auth/IAuthentication';
 import { IRepoRepository } from './domain/IRepoRepository';
 import { IUserRepository } from './domain/IUserRepository';
+import { IWorkflowRunRepository } from './domain/IWorkflowRunRepository';
 import { RepoRepository } from './infra/github/RepoRepository';
 import { Settings } from './settings-types';
 import { TsoaAuthentication } from './api/auth/TsoaAuthentication';
 import { UserRepository } from './infra/github/UserRepository';
+import { WorkflowRunRepository } from './infra/github/WorkflowRunRepository';
 import { octokitFactory } from './infra/github/OctokitFactory';
 
 const SERVER_PREFIX = 'gha-build-monitor';
@@ -20,32 +22,26 @@ const SERVER_NAME = 'gha-build-monitor';
 export interface ApiDependencies {
   readonly userRepo: IUserRepository;
   readonly repoRepo: IRepoRepository;
+  readonly workflowRunRepo: IWorkflowRunRepository;
 }
 
 export class CompositionRoot implements IControllerFactory {
   private constructor(
     private readonly settings: Settings,
     private readonly meta: MetaInfo,
-    private readonly userRepo: IUserRepository,
-    private readonly repoRepo: IRepoRepository
+    private readonly dependencies: ApiDependencies
   ) {}
 
   public static forProd(settings: Settings): CompositionRoot {
-    return new CompositionRoot(
-      settings,
-      metaFromPackageJson,
-      new UserRepository(octokitFactory),
-      new RepoRepository(octokitFactory)
-    );
+    return new CompositionRoot(settings, metaFromPackageJson, {
+      userRepo: new UserRepository(octokitFactory),
+      repoRepo: new RepoRepository(octokitFactory),
+      workflowRunRepo: new WorkflowRunRepository(octokitFactory),
+    });
   }
 
   public static forTesting(settings: Settings, dependencies: ApiDependencies): CompositionRoot {
-    return new CompositionRoot(
-      settings,
-      metaFromPackageJson,
-      dependencies.userRepo,
-      dependencies.repoRepo
-    );
+    return new CompositionRoot(settings, metaFromPackageJson, dependencies);
   }
 
   public get<T>(controllerConstructor: ConstructorFunction<T>): Controller {
@@ -59,7 +55,8 @@ export class CompositionRoot implements IControllerFactory {
             name: SERVER_NAME,
             version: this.meta.version,
           },
-          this.repoRepo
+          this.dependencies.repoRepo,
+          this.dependencies.workflowRunRepo
         );
       case DiagnosticsController.name:
         return new DiagnosticsController(this.meta);
@@ -71,6 +68,6 @@ export class CompositionRoot implements IControllerFactory {
   }
 
   public getAuthentication(): IAuthentication {
-    return new TsoaAuthentication([new BearerAuthenticationProvider(this.userRepo)]);
+    return new TsoaAuthentication([new BearerAuthenticationProvider(this.dependencies.userRepo)]);
   }
 }

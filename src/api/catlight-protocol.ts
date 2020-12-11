@@ -23,7 +23,7 @@ export interface User {
 /**
  * @see https://github.com/catlightio/catlight-protocol#build
  */
-interface Build {
+export interface Build {
   /**
    * Id should be unique within the parent build definition.
    */
@@ -69,7 +69,7 @@ interface Build {
 /**
  * @see https://github.com/catlightio/catlight-protocol#buildbranch
  */
-interface BuildBranch {
+export interface BuildBranch {
   /**
    * Id should be unique within the parent build definition.
    *
