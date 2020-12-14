@@ -22,7 +22,7 @@ You need a Personal Access Token (PAT) with the `repo` scope.
 - Create a token (for instance `gha-build-monitor`)
 - ... with the scope `repo`
 
-### Connecting Catligh
+### Connecting Catlight
 In CatLight, you need to : 
 - Add new connection
 - choose "CatLight-compatible"
