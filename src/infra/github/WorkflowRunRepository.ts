@@ -88,6 +88,9 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
         if (runConclusion === 'cancelled') {
           return 'Canceled';
         }
+        if (runConclusion === 'startup_failure') {
+          return 'Failed';
+        }
         break;
       case 'in_progress':
         return 'Running';
