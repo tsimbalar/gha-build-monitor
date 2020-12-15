@@ -18,7 +18,7 @@ Open `http://localhost:9901/_/healthcheck` in a browser to check that the server
 ### Creating a GitHub Access Token
 You need a Personal Access Token (PAT) with the `repo` scope.
 
-- Go to https://github.com/settings/tokens
+- Go to https://github.com/settings/tokens/new?scopes=repo&description=gha-build-monitor
 - Create a token (for instance `gha-build-monitor`)
 - ... with the scope `repo`
 
