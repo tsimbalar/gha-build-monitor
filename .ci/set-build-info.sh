@@ -22,7 +22,7 @@ if [ -z "$GITHUB_SHA" ]; then
   exit 1
 fi
 
-echo "Got GITHUB_RUN_NUMBER=\"$GITHUB_RUN_NUMBER\" GITHUB_REF=\"$GITHUB_REF\" GITHUB_SHA=\"GITHUB_SHA\""
+echo "Got GITHUB_RUN_NUMBER=\"$GITHUB_RUN_NUMBER\" GITHUB_REF=\"$GITHUB_REF\" GITHUB_SHA=\"$GITHUB_SHA\""
 
 build_date="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 echo "Build date is $build_date"
