@@ -27,7 +27,7 @@ In CatLight, you need to :
 - Add new connection
 - choose "CatLight-compatible"
 - To login choose : 
-  - Url : `http://localhost:9901/basic` (or another port if you chose it)
+  - Url : `http://localhost:9901/dynamic` (or another port if you chose it)
   - "Use token"
   - paste your PAT
 - Connect
