@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTestTools';
-import { BuildDefinition, Space } from '../catlight-protocol';
+import { BuildDefinition, Space } from '../../catlight-protocol/basic';
 import { RepoName, Workflow } from '../../domain/IRepoRepository';
 import { BasicBuildInfoResponse } from '../api-types';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';

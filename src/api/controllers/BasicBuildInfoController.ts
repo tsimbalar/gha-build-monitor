@@ -1,4 +1,5 @@
-import * as catlight from '../catlight-protocol';
+import * as catlightBasic from '../../catlight-protocol/basic';
+import * as catlightCore from '../../catlight-protocol/shared';
 import * as express from 'express';
 import { Controller, Get, Request, Route, Security } from '@tsoa/runtime';
 import { IRepoRepository, Repo, Workflow } from '../../domain/IRepoRepository';
@@ -36,7 +37,7 @@ export class BasicBuildInfoController extends Controller {
   ): Promise<BasicBuildInfoResponse> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const currentUser = request.user!;
-    const userResponse: catlight.User = { name: currentUser.name, id: currentUser.id };
+    const userResponse: catlightCore.User = { name: currentUser.name, id: currentUser.id };
 
     // const gitHubClient = this.githubFactory.getForToken(currentUser.token);
 
@@ -171,7 +172,7 @@ export class BasicBuildInfoController extends Controller {
   private mapToBuildDefinition(
     repo: Repo,
     workflowAndRuns: WorkflowAndRuns
-  ): catlight.BuildDefinition {
+  ): catlightBasic.BuildDefinition {
     const workflow = workflowAndRuns.workflow;
     const runsPerBranch = workflowAndRuns.runs;
     return {
@@ -183,14 +184,14 @@ export class BasicBuildInfoController extends Controller {
     };
   }
 
-  private mapToBuildBranches(runsPerBranch: WorkflowRunsPerBranch): catlight.BuildBranch[] {
-    return [...runsPerBranch.entries()].map<catlight.BuildBranch>(([branchName, runs]) => ({
+  private mapToBuildBranches(runsPerBranch: WorkflowRunsPerBranch): catlightCore.BuildBranch[] {
+    return [...runsPerBranch.entries()].map<catlightCore.BuildBranch>(([branchName, runs]) => ({
       id: branchName,
       builds: runs.map((r) => this.mapToBuild(r)),
     }));
   }
 
-  private mapToBuild(run: WorkflowRun): catlight.Build {
+  private mapToBuild(run: WorkflowRun): catlightCore.Build {
     return {
       id: run.id,
       startTime: run.startTime,
