@@ -1,10 +1,11 @@
 import * as catlightCore from '../../catlight-protocol/shared';
 import * as catlightDynamic from '../../catlight-protocol/dynamic';
 import * as express from 'express';
-import { Controller, Get, Request, Route, Security } from '@tsoa/runtime';
+import { Body, Controller, Get, Post, Request, Response, Route, Security } from '@tsoa/runtime';
+import { DynamicBuildInfoMetadataResponse, DynamicFilteredBuildInfoRequest } from '../api-types';
 import { IRepoRepository, Repo, Workflow } from '../../domain/IRepoRepository';
 import { IWorkflowRunRepository, WorkflowRunsPerBranch } from '../../domain/IWorkflowRunRepository';
-import { DynamicBuildInfoMetadataResponse } from '../api-types';
+import { ValidationErrorJson } from '../middleware/schema-validation';
 
 interface ServerInfo {
   readonly id: string;
@@ -46,6 +47,22 @@ export class DynamicBuildInfoController extends Controller {
         webUrl: repo.webUrl,
         buildDefinitions: repo.workflows.map((wf) => this.mapToBuildDefinition(repo, wf)),
       })),
+    };
+  }
+
+  @Post('')
+  @Security('bearerAuth', ['repo'])
+  @Response<ValidationErrorJson>(422, 'Validation error')
+  public async getServerState(
+    @Body() filters: DynamicFilteredBuildInfoRequest
+  ): Promise<DynamicBuildInfoMetadataResponse> {
+    return {
+      protocol: 'https://catlight.io/protocol/v1.0/dynamic',
+      id: this.serverInfo.id,
+      name: this.serverInfo.name,
+      serverVersion: this.serverInfo.version,
+      webUrl: 'http://myserver.example/dashboard',
+      spaces: [],
     };
   }
 
