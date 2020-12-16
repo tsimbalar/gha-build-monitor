@@ -388,7 +388,7 @@ components:
             bearerFormat: JWT
 info:
     title: gha-build-monitor
-    version: 0.0.1
+    version: 0.1.0
     description: 'Adapter to give access to GitHub Actions status via the CatLight Protocol'
     license:
         name: MIT
