@@ -170,7 +170,7 @@ export interface ServerStateResponse {
   /**
    * Constant string that defines the version and mode of CatLight protocol.
    */
-  readonly protocol: 'https://catlight.io/protocol/v1.0/basic';
+  readonly protocol: 'https://catlight.io/protocol/v1.0/dynamic';
   /**
    * Globally unique server id.
    *

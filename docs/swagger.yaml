@@ -265,6 +265,61 @@ components:
             additionalProperties: false
         DynamicBuildInfoMetadataResponse:
             $ref: '#/components/schemas/ServerMetadata'
+        BuildDefinitionStateResponse:
+            properties:
+                id:
+                    type: string
+                    description: 'Id should be unique in parent space.'
+                branches:
+                    items:
+                        $ref: '#/components/schemas/BuildBranch'
+                    type: array
+                    description: "Branches array should include:\n\nPrimary branches (master, develop, etc.)\nActive feature branches that had builds in the past 30 days.\n\nIf your system cannot separate builds into branches, add a single branch to this array with id = \"~all\""
+                folder:
+                    type: string
+                    description: 'Path to the build definition, e.g. "my folder/sub-folder".'
+            required:
+                - id
+                - branches
+            type: object
+            additionalProperties: false
+        SpaceStateResponse:
+            properties:
+                id:
+                    type: string
+                    description: 'Space id should be unique on the server.'
+                buildDefinitions:
+                    items:
+                        $ref: '#/components/schemas/BuildDefinitionStateResponse'
+                    type: array
+            required:
+                - id
+                - buildDefinitions
+            type: object
+            additionalProperties: false
+        ServerStateResponse:
+            properties:
+                protocol:
+                    type: string
+                    enum:
+                        - 'https://catlight.io/protocol/v1.0/dynamic'
+                    nullable: false
+                    description: 'Constant string that defines the version and mode of CatLight protocol.'
+                id:
+                    type: string
+                    description: "Globally unique server id.\n\nServer id must be globally unique and should not change.\n\n# How to choose server id?\nFor online services, you can use your domain name, e.g. \"myserver.com\"\nFor installed servers, use your domain or product name + unique installation id. For example, \"myserver.com/3A5126E7-EE74-48E4-9997-1C1DE52BA711\". If your server does not have unique id, you can generate a GUID during installation and save it to configuration file.\n\nTry to keep the id shorter than 100 symbols. If your server has a built-in unique id that is very long, you can use a hash sum of it that should be shorter."
+                spaces:
+                    items:
+                        $ref: '#/components/schemas/SpaceStateResponse'
+                    type: array
+            required:
+                - protocol
+                - id
+                - spaces
+            type: object
+            additionalProperties: false
+        DynamicFilteredBuildInfoResponse:
+            $ref: '#/components/schemas/ServerStateResponse'
         ValidationErrorJson:
             properties:
                 msg:
@@ -407,7 +462,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/DynamicBuildInfoMetadataResponse'
+                                $ref: '#/components/schemas/DynamicFilteredBuildInfoResponse'
                 '422':
                     description: 'Validation error'
                     content:
