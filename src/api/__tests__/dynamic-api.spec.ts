@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTestTools';
 import { BuildDefinitionMetadata, SpaceMetadata } from '../../catlight-protocol/dynamic';
+import {
+  DynamicBuildInfoMetadataResponse,
+  DynamicFilteredBuildInfoRequest,
+  DynamicFilteredBuildInfoResponse,
+} from '../api-types';
 import { RepoName, Workflow } from '../../domain/IRepoRepository';
-import { DynamicBuildInfoMetadataResponse } from '../api-types';
+
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
 import { InMemoryWorkflowRunRepository } from '../../infra/memory/InMemoryWorkflowRunRepository';
 import { UserWithScopes } from '../../domain/IUserRepository';
+import { ValidationErrorJson } from '../middleware/schema-validation';
 
 describe('/dynamic', () => {
   describe('GET /dynamic', () => {
@@ -148,6 +154,173 @@ describe('/dynamic', () => {
           },
         ]);
       });
+    });
+  });
+
+  describe('POST /dynamic', () => {
+    const VALID_MINIMAL_POST_PAYLOAD: DynamicFilteredBuildInfoRequest = {
+      id: 'something',
+      spaces: [],
+    };
+
+    test('should return a 401 status code when missing bearer token', async () => {
+      const agent = ApiTestTools.createTestAgent();
+      const response = await agent.post('/dynamic').send();
+      expect(response.status).toBe(401);
+      expect(response.type).toBe('application/json');
+    });
+
+    test('should return a 403 status code when token misses "repo" scope', async () => {
+      const token = 'THIS_IS_THE_TOKEN';
+      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: [] };
+      const userRepo = new InMemoryUserRepository();
+      userRepo.addUser(token, user);
+
+      const agent = ApiTestTools.createTestAgent({ userRepo });
+
+      const response = await agent
+        .post('/dynamic')
+        .set('Authorization', `Bearer ${token}`)
+        .send(VALID_MINIMAL_POST_PAYLOAD);
+      expect(response.status).toBe(403);
+      expect(response.type).toBe('application/json');
+    });
+
+    describe('with token of existing user', () => {
+      const token = 'THIS_IS_THE_TOKEN';
+      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: ['repo'] };
+      const installationId = 'THE_INSTALLATION_ID';
+      let agent: TestAgent;
+      let repoRepo: InMemoryRepoRepository;
+      let workflowRunRepo: InMemoryWorkflowRunRepository;
+
+      beforeEach(() => {
+        const userRepo = new InMemoryUserRepository();
+        userRepo.addUser(token, user);
+
+        repoRepo = new InMemoryRepoRepository();
+        workflowRunRepo = new InMemoryWorkflowRunRepository();
+
+        agent = ApiTestTools.createTestAgent(
+          { userRepo, repoRepo, workflowRunRepo },
+          {
+            ...TEST_SETTINGS,
+            catlight: { ...TEST_SETTINGS.catlight, installationId },
+          }
+        );
+      });
+
+      test('should return a 422 status code when provided invalid payload', async () => {
+        const invalidRequestBody = { this: 'is', not: 'what we want' };
+
+        const response = await agent
+          .post('/dynamic')
+          .set('Authorization', `Bearer ${token}`)
+          .send(invalidRequestBody);
+
+        expect(response.status).toBe(422);
+        expect(response.type).toBe('application/json');
+
+        const body = response.body as ValidationErrorJson;
+        expect(body.technicalDetails.msg).toContain('Validation failed');
+        expect(body.technicalDetails.errors).toContain("filters.spaces - 'spaces' is required");
+      });
+
+      test('should return a 200 status code', async () => {
+        const response = await agent
+          .post('/dynamic')
+          .set('Authorization', `Bearer ${token}`)
+          .send(VALID_MINIMAL_POST_PAYLOAD);
+
+        expect(response.status).toBe(200);
+        expect(response.type).toBe('application/json');
+
+        const body = response.body as DynamicFilteredBuildInfoResponse;
+        expect(body.protocol).toBe('https://catlight.io/protocol/v1.0/dynamic');
+      });
+
+      test('should identify server as gha-build-monitor', async () => {
+        const response = await agent
+          .post('/dynamic')
+          .set('Authorization', `Bearer ${token}`)
+          .send(VALID_MINIMAL_POST_PAYLOAD);
+
+        const body = response.body as DynamicFilteredBuildInfoResponse;
+        expect(body.id).toMatch(/^gha-build-monitor.*/u);
+      });
+
+      test('should have installationId in server id', async () => {
+        const response = await agent
+          .post('/dynamic')
+          .set('Authorization', `Bearer ${token}`)
+          .send(VALID_MINIMAL_POST_PAYLOAD);
+
+        const body = response.body as DynamicFilteredBuildInfoResponse;
+        expect(body.id).toMatch(RegExp(`${installationId}$`, 'u'));
+      });
+
+      // test('should return spaces of user', async () => {
+      //   const repo1 = { id: '789', name: new RepoName('orgx', 'repoa'), webUrl: '', workflows: [] };
+      //   const repo2 = { id: '123', name: new RepoName('orgx', 'repoz'), webUrl: '', workflows: [] };
+      //   repoRepo.addRepo(repo1);
+      //   repoRepo.addRepo(repo2);
+      //   const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
+
+      //   const body = response.body as DynamicBuildInfoMetadataResponse;
+      //   expect(body.spaces).toEqual<SpaceMetadata[]>([
+      //     {
+      //       id: repo1.id,
+      //       name: repo1.name.fullName,
+      //       webUrl: repo1.webUrl,
+      //       buildDefinitions: expect.anything(),
+      //     },
+      //     {
+      //       id: repo2.id,
+      //       name: repo2.name.fullName,
+      //       webUrl: repo2.webUrl,
+      //       buildDefinitions: expect.anything(),
+      //     },
+      //   ]);
+      // });
+
+      // test('should return build definitions', async () => {
+      //   const workflow1: Workflow = {
+      //     id: 'worflow-id',
+      //     name: 'workflow-name',
+      //     webUrl: 'http://www.perdu.com',
+      //   };
+      //   const workflow2: Workflow = {
+      //     id: 'worflow-id2',
+      //     name: 'workflow-name2',
+      //     webUrl: 'http://www.perdu2.com',
+      //   };
+      //   const repoName = new RepoName('orgx', 'repoz');
+      //   repoRepo.addRepo({
+      //     id: '123',
+      //     name: repoName,
+      //     webUrl: '',
+      //     workflows: [workflow1, workflow2],
+      //   });
+      //   const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
+
+      //   const body = response.body as DynamicBuildInfoMetadataResponse;
+      //   expect(body.spaces).toHaveLength(1);
+      //   const buildDefinitions = body.spaces[0].buildDefinitions;
+      //   expect(buildDefinitions).toEqual<BuildDefinitionMetadata[]>([
+      //     {
+      //       id: workflow1.id,
+      //       name: workflow1.name,
+      //       folder: repoName.fullName,
+      //       webUrl: workflow1.webUrl,
+      //     },
+      //     {
+      //       id: workflow2.id,
+      //       name: workflow2.name,
+      //       folder: repoName.fullName,
+      //       webUrl: workflow2.webUrl,
+      //     },
+      //   ]);
+      // });
 
       // test('should return build branches', async () => {
       //   const repoName = new RepoName('orgx', 'repoz');

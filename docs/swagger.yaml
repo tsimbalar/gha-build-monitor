@@ -399,6 +399,32 @@ paths:
                     bearerAuth:
                         - repo
             parameters: []
+        post:
+            operationId: GetServerState
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DynamicBuildInfoMetadataResponse'
+                '422':
+                    description: 'Validation error'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationErrorJson'
+            security:
+                -
+                    bearerAuth:
+                        - repo
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DynamicFilteredBuildInfoRequest'
     /examples/basic/basic:
         get:
             operationId: GetBasicExample
