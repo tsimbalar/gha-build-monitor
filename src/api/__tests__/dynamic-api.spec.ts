@@ -13,6 +13,7 @@ import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepositor
 import { InMemoryWorkflowRunRepository } from '../../infra/memory/InMemoryWorkflowRunRepository';
 import { UserWithScopes } from '../../domain/IUserRepository';
 import { ValidationErrorJson } from '../middleware/schema-validation';
+import { WorkflowRun } from '../../domain/IWorkflowRunRepository';
 
 describe('/dynamic', () => {
   describe('GET /dynamic', () => {
@@ -102,13 +103,13 @@ describe('/dynamic', () => {
         const body = response.body as DynamicBuildInfoMetadataResponse;
         expect(body.spaces).toEqual<SpaceMetadata[]>([
           {
-            id: repo1.id,
+            id: repo1.name.fullName,
             name: repo1.name.fullName,
             webUrl: repo1.webUrl,
             buildDefinitions: expect.anything(),
           },
           {
-            id: repo2.id,
+            id: repo2.name.fullName,
             name: repo2.name.fullName,
             webUrl: repo2.webUrl,
             buildDefinitions: expect.anything(),
@@ -259,126 +260,82 @@ describe('/dynamic', () => {
         expect(body.id).toMatch(RegExp(`${installationId}$`, 'u'));
       });
 
-      // test('should return spaces of user', async () => {
-      //   const repo1 = { id: '789', name: new RepoName('orgx', 'repoa'), webUrl: '', workflows: [] };
-      //   const repo2 = { id: '123', name: new RepoName('orgx', 'repoz'), webUrl: '', workflows: [] };
-      //   repoRepo.addRepo(repo1);
-      //   repoRepo.addRepo(repo2);
-      //   const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
+      test('should return details when a single build info is requested', async () => {
+        const repoName = new RepoName('orgx', 'repoa');
 
-      //   const body = response.body as DynamicBuildInfoMetadataResponse;
-      //   expect(body.spaces).toEqual<SpaceMetadata[]>([
-      //     {
-      //       id: repo1.id,
-      //       name: repo1.name.fullName,
-      //       webUrl: repo1.webUrl,
-      //       buildDefinitions: expect.anything(),
-      //     },
-      //     {
-      //       id: repo2.id,
-      //       name: repo2.name.fullName,
-      //       webUrl: repo2.webUrl,
-      //       buildDefinitions: expect.anything(),
-      //     },
-      //   ]);
-      // });
+        const workflow1: Workflow = {
+          id: 'worflow-id',
+          name: 'workflow-name',
+          webUrl: 'http://www.perdu.com',
+        };
+        const repo1 = {
+          id: '789',
+          name: repoName,
+          webUrl: '',
+          workflows: [workflow1],
+        };
 
-      // test('should return build definitions', async () => {
-      //   const workflow1: Workflow = {
-      //     id: 'worflow-id',
-      //     name: 'workflow-name',
-      //     webUrl: 'http://www.perdu.com',
-      //   };
-      //   const workflow2: Workflow = {
-      //     id: 'worflow-id2',
-      //     name: 'workflow-name2',
-      //     webUrl: 'http://www.perdu2.com',
-      //   };
-      //   const repoName = new RepoName('orgx', 'repoz');
-      //   repoRepo.addRepo({
-      //     id: '123',
-      //     name: repoName,
-      //     webUrl: '',
-      //     workflows: [workflow1, workflow2],
-      //   });
-      //   const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
+        repoRepo.addRepo(repo1);
 
-      //   const body = response.body as DynamicBuildInfoMetadataResponse;
-      //   expect(body.spaces).toHaveLength(1);
-      //   const buildDefinitions = body.spaces[0].buildDefinitions;
-      //   expect(buildDefinitions).toEqual<BuildDefinitionMetadata[]>([
-      //     {
-      //       id: workflow1.id,
-      //       name: workflow1.name,
-      //       folder: repoName.fullName,
-      //       webUrl: workflow1.webUrl,
-      //     },
-      //     {
-      //       id: workflow2.id,
-      //       name: workflow2.name,
-      //       folder: repoName.fullName,
-      //       webUrl: workflow2.webUrl,
-      //     },
-      //   ]);
-      // });
+        const branch1 = 'master';
+        const branch1Runs: WorkflowRun[] = [
+          {
+            id: 'master1',
+            startTime: new Date(),
+            status: 'Queued',
+            webUrl: 'http://....',
+          },
+        ];
 
-      // test('should return build branches', async () => {
-      //   const repoName = new RepoName('orgx', 'repoz');
-      //   const workflowId = 'worflow-id';
-      //   repoRepo.addRepo({
-      //     id: '123',
-      //     name: repoName,
-      //     webUrl: '',
-      //     workflows: [
-      //       {
-      //         id: workflowId,
-      //         name: 'workflow-name',
-      //         webUrl: 'http://www.perdu.com',
-      //       },
-      //     ],
-      //   });
+        const branch2 = 'develop';
+        const branch2Runs: WorkflowRun[] = [
+          {
+            id: 'develop1',
+            startTime: new Date(),
+            status: 'Queued',
+            webUrl: 'http://....',
+          },
+        ];
 
-      //   const branch1 = 'master';
-      //   const branch1Runs: WorkflowRun[] = [
-      //     {
-      //       id: 'master1',
-      //       startTime: new Date(),
-      //       status: 'Queued',
-      //       webUrl: 'http://....',
-      //     },
-      //   ];
+        workflowRunRepo.addRuns(repoName, workflow1.id, branch1, branch1Runs);
+        workflowRunRepo.addRuns(repoName, workflow1.id, branch2, branch2Runs);
 
-      //   const branch2 = 'develop';
-      //   const branch2Runs: WorkflowRun[] = [
-      //     {
-      //       id: 'develop1',
-      //       startTime: new Date(),
-      //       status: 'Queued',
-      //       webUrl: 'http://....',
-      //     },
-      //   ];
+        const requestBody: DynamicFilteredBuildInfoRequest = {
+          id: VALID_MINIMAL_POST_PAYLOAD.id,
+          spaces: [
+            {
+              id: repo1.name.fullName,
+              buildDefinitions: [
+                {
+                  id: workflow1.id,
+                },
+              ],
+            },
+          ],
+        };
 
-      //   workflowRunRepo.addRuns(repoName, workflowId, branch1, branch1Runs);
-      //   workflowRunRepo.addRuns(repoName, workflowId, branch2, branch2Runs);
-      //   const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
+        const response = await agent
+          .post('/dynamic')
+          .set('Authorization', `Bearer ${token}`)
+          .send(requestBody);
 
-      //   const body = response.body as BasicBuildInfoResponse;
-      //   expect(body.spaces).toHaveLength(1);
-      //   const buildDefinitions = body.spaces[0].buildDefinitions;
-      //   expect(buildDefinitions).toHaveLength(1);
-      //   const buildBranches = buildDefinitions[0].branches;
-      //   expect(buildBranches).toHaveLength(2);
+        const body = response.body as DynamicFilteredBuildInfoResponse;
+        expect(body.spaces).toHaveLength(1);
+        const buildDefinitions = body.spaces[0].buildDefinitions;
+        expect(buildDefinitions).toHaveLength(1);
+        const buildBranches = buildDefinitions[0].branches;
+        expect(buildBranches).toHaveLength(2);
 
-      //   const buildBranch1 = buildBranches.find((b) => b.id === branch1)!;
-      //   expect(buildBranch1).toBeDefined();
-      //   expect(buildBranch1.builds).toHaveLength(1);
-      //   expect(buildBranch1.builds[0].id).toBe('master1');
+        const buildBranch1 = buildBranches.find((b) => b.id === branch1)!;
+        expect(buildBranch1).toBeDefined();
+        expect(buildBranch1.builds).toHaveLength(1);
+        expect(buildBranch1.builds[0].id).toBe('master1');
 
-      //   const buildBranch2 = buildBranches.find((b) => b.id === branch2)!;
-      //   expect(buildBranch2).toBeDefined();
-      //   expect(buildBranch2.builds).toHaveLength(1);
-      //   expect(buildBranch2.builds[0].id).toBe('develop1');
-      // });
+        const buildBranch2 = buildBranches.find((b) => b.id === branch2)!;
+        expect(buildBranch2).toBeDefined();
+        expect(buildBranch2.builds).toHaveLength(1);
+        expect(buildBranch2.builds[0].id).toBe('develop1');
+      });
     });
   });
 });
