@@ -4,6 +4,7 @@ import { BasicBuildInfoController } from './api/controllers/BasicBuildInfoContro
 import { BearerAuthenticationProvider } from './api/auth/BearerAuthenticationProvider';
 import { Controller } from '@tsoa/runtime';
 import { DiagnosticsController } from './api/controllers/DiagnosticsController';
+import { DynamicBuildInfoController } from './api/controllers/DynamicBuildInfoController';
 import { ExampleController } from './api/controllers/ExampleController';
 import { IAuthentication } from './api/auth/IAuthentication';
 import { IRepoRepository } from './domain/IRepoRepository';
@@ -50,6 +51,16 @@ export class CompositionRoot implements IControllerFactory {
         return new ExampleController();
       case BasicBuildInfoController.name:
         return new BasicBuildInfoController(
+          {
+            id: `${SERVER_PREFIX}/${this.settings.catlight.installationId}`,
+            name: SERVER_NAME,
+            version: this.meta.version,
+          },
+          this.dependencies.repoRepo,
+          this.dependencies.workflowRunRepo
+        );
+      case DynamicBuildInfoController.name:
+        return new DynamicBuildInfoController(
           {
             id: `${SERVER_PREFIX}/${this.settings.catlight.installationId}`,
             name: SERVER_NAME,

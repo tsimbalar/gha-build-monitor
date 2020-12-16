@@ -384,6 +384,21 @@ paths:
                 -
                     bearerAuth: []
             parameters: []
+    /dynamic:
+        get:
+            operationId: GetMetadata
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DynamicBuildInfoMetadataResponse'
+            security:
+                -
+                    bearerAuth:
+                        - repo
+            parameters: []
     /examples/basic/basic:
         get:
             operationId: GetBasicExample
