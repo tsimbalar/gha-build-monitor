@@ -51,7 +51,7 @@ describe('/examples', () => {
         id: 'myAwesomeServer/12345678-1234-4567-abcd-123456789abc',
         spaces: [
           {
-            id: 'super-project',
+            id: 'owner/repo',
             buildDefinitions: [
               {
                 id: 'nightly-build',
