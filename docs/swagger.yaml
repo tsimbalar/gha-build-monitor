@@ -355,6 +355,9 @@ components:
                 id:
                     type: string
                     description: 'Space id should be unique on the server.'
+                    example: owner/repo
+                    minLength: 1
+                    pattern: '^[^/]+/[^/]+$'
                 buildDefinitions:
                     items:
                         $ref: '#/components/schemas/BuildDefinitionStateRequest'
@@ -388,7 +391,7 @@ components:
             bearerFormat: JWT
 info:
     title: gha-build-monitor
-    version: 0.1.0
+    version: 0.2.0
     description: 'Adapter to give access to GitHub Actions status via the CatLight Protocol'
     license:
         name: MIT

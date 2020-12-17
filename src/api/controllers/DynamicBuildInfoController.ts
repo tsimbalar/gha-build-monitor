@@ -7,7 +7,7 @@ import {
   DynamicFilteredBuildInfoRequest,
   DynamicFilteredBuildInfoResponse,
 } from '../api-types';
-import { IRepoRepository, Repo, RepoName, Workflow } from '../../domain/IRepoRepository';
+import { IRepoRepository, RepoName, Workflow } from '../../domain/IRepoRepository';
 import {
   IWorkflowRunRepository,
   WorkflowRun,
@@ -58,7 +58,9 @@ export class DynamicBuildInfoController extends Controller {
         id: repo.name.fullName,
         name: repo.name.fullName,
         webUrl: repo.webUrl,
-        buildDefinitions: repo.workflows.map((wf) => this.mapToBuildDefinitionMetadata(repo, wf)),
+        buildDefinitions: repo.workflows.map((wf) =>
+          this.mapToBuildDefinitionMetadata(repo.name, wf)
+        ),
       })),
     };
   }
@@ -161,13 +163,13 @@ export class DynamicBuildInfoController extends Controller {
   }
 
   private mapToBuildDefinitionMetadata(
-    repo: Repo,
+    repo: RepoName,
     workflow: Workflow
   ): catlightDynamic.BuildDefinitionMetadata {
     return {
       id: workflow.id,
-      name: workflow.name,
-      folder: repo.name.fullName,
+      name: `${repo.name} · ${workflow.name}`,
+      folder: repo.owner,
       webUrl: workflow.webUrl,
     };
   }

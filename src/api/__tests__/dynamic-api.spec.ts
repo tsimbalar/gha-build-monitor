@@ -118,6 +118,7 @@ describe('/dynamic', () => {
       });
 
       test('should return build definitions', async () => {
+        const repoOwner = 'orgx';
         const workflow1: Workflow = {
           id: 'worflow-id',
           name: 'workflow-name',
@@ -128,7 +129,7 @@ describe('/dynamic', () => {
           name: 'workflow-name2',
           webUrl: 'http://www.perdu2.com',
         };
-        const repoName = new RepoName('orgx', 'repoz');
+        const repoName = new RepoName(repoOwner, 'repoz');
         repoRepo.addRepo({
           id: '123',
           name: repoName,
@@ -143,14 +144,14 @@ describe('/dynamic', () => {
         expect(buildDefinitions).toEqual<BuildDefinitionMetadata[]>([
           {
             id: workflow1.id,
-            name: workflow1.name,
-            folder: repoName.fullName,
+            name: 'repoz · workflow-name',
+            folder: repoOwner,
             webUrl: workflow1.webUrl,
           },
           {
             id: workflow2.id,
-            name: workflow2.name,
-            folder: repoName.fullName,
+            name: 'repoz · workflow-name2',
+            folder: repoOwner,
             webUrl: workflow2.webUrl,
           },
         ]);
@@ -225,6 +226,32 @@ describe('/dynamic', () => {
         const body = response.body as ValidationErrorJson;
         expect(body.technicalDetails.msg).toContain('Validation failed');
         expect(body.technicalDetails.errors).toContain("filters.spaces - 'spaces' is required");
+      });
+
+      test('should return a 422 status code when provided a badly formatted space id', async () => {
+        const invalidRequestBody: DynamicFilteredBuildInfoRequest = {
+          ...VALID_MINIMAL_POST_PAYLOAD,
+          spaces: [
+            {
+              id: 'not-a-valid-repo',
+              buildDefinitions: [],
+            },
+          ],
+        };
+
+        const response = await agent
+          .post('/dynamic')
+          .set('Authorization', `Bearer ${token}`)
+          .send(invalidRequestBody);
+
+        expect(response.status).toBe(422);
+        expect(response.type).toBe('application/json');
+
+        const body = response.body as ValidationErrorJson;
+        expect(body.technicalDetails.msg).toContain('Validation failed');
+        expect(body.technicalDetails.errors).toContain(
+          'spaces.$0.id - Not match in \'^[^/]+/[^/]+$\'(provided : "not-a-valid-repo")'
+        );
       });
 
       test('should return a 200 status code', async () => {
