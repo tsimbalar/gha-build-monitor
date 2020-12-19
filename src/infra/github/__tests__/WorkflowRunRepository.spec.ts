@@ -2,10 +2,14 @@ import { THIS_REPO_MAIN_WORKFLOW, THIS_REPO_NAME } from '../__testTools__/TestCo
 import { RepoName } from '../../../domain/IRepoRepository';
 import { WorkflowRun } from '../../../domain/IWorkflowRunRepository';
 import { WorkflowRunRepository } from '../WorkflowRunRepository';
-import { octokitFactory } from '../OctokitFactory';
+import { getOctokitFactory } from '../OctokitFactory';
 import { testCredentials } from '../__testTools__/TestCredentials';
 
 describe('WorkflowRunRepository', () => {
+  const octokitFactory = getOctokitFactory({
+    version: 'v0-tests',
+    buildInfo: {},
+  });
   describe('getLatestRunsForWorkflow', () => {
     test('should retrieve runs of public repo', async () => {
       const sut = new WorkflowRunRepository(octokitFactory);

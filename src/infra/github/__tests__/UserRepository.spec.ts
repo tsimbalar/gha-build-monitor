@@ -1,10 +1,14 @@
 import { THIS_REPO_OWNER } from '../__testTools__/TestConstants';
 import { UserRepository } from '../UserRepository';
 import { UserWithScopes } from '../../../domain/IUserRepository';
-import { octokitFactory } from '../OctokitFactory';
+import { getOctokitFactory } from '../OctokitFactory';
 import { testCredentials } from '../__testTools__/TestCredentials';
 
 describe('UserRepository', () => {
+  const octokitFactory = getOctokitFactory({
+    version: 'v0-tests',
+    buildInfo: {},
+  });
   describe('getUserFromToken', () => {
     test('should return user info with valid token', async () => {
       const sut = new UserRepository(octokitFactory);

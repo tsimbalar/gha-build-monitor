@@ -15,7 +15,7 @@ import { Settings } from './settings-types';
 import { TsoaAuthentication } from './api/auth/TsoaAuthentication';
 import { UserRepository } from './infra/github/UserRepository';
 import { WorkflowRunRepository } from './infra/github/WorkflowRunRepository';
-import { octokitFactory } from './infra/github/OctokitFactory';
+import { getOctokitFactory } from './infra/github/OctokitFactory';
 
 const SERVER_PREFIX = 'gha-build-monitor';
 const SERVER_NAME = 'gha-build-monitor';
@@ -34,6 +34,7 @@ export class CompositionRoot implements IControllerFactory {
   ) {}
 
   public static forProd(settings: Settings): CompositionRoot {
+    const octokitFactory = getOctokitFactory(metaFromPackageJson);
     return new CompositionRoot(settings, metaFromPackageJson, {
       userRepo: new UserRepository(octokitFactory),
       repoRepo: new RepoRepository(octokitFactory),

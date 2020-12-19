@@ -6,10 +6,14 @@ import {
 } from '../__testTools__/TestConstants';
 import { Repo } from '../../../domain/IRepoRepository';
 import { RepoRepository } from '../RepoRepository';
-import { octokitFactory } from '../OctokitFactory';
+import { getOctokitFactory } from '../OctokitFactory';
 import { testCredentials } from '../__testTools__/TestCredentials';
 
 describe('RepoRepository', () => {
+  const octokitFactory = getOctokitFactory({
+    version: 'v0-tests',
+    buildInfo: {},
+  });
   describe('listForToken', () => {
     test('should return only public repos when using "no scope" token', async () => {
       const sut = new RepoRepository(octokitFactory);
