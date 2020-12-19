@@ -145,13 +145,13 @@ describe('/dynamic', () => {
           {
             id: workflow1.id,
             name: 'repoz · workflow-name',
-            folder: repoOwner,
+            folder: repoName.fullName,
             webUrl: workflow1.webUrl,
           },
           {
             id: workflow2.id,
             name: 'repoz · workflow-name2',
-            folder: repoOwner,
+            folder: repoName.fullName,
             webUrl: workflow2.webUrl,
           },
         ]);

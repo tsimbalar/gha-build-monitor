@@ -169,7 +169,7 @@ export class DynamicBuildInfoController extends Controller {
     return {
       id: workflow.id,
       name: `${repo.name} · ${workflow.name}`,
-      folder: repo.owner,
+      folder: repo.fullName,
       webUrl: workflow.webUrl,
     };
   }
