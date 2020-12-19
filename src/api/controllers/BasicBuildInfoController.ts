@@ -37,7 +37,10 @@ export class BasicBuildInfoController extends Controller {
   ): Promise<BasicBuildInfoResponse> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const currentUser = request.user!;
-    const userResponse: catlightCore.User = { name: currentUser.name, id: currentUser.id };
+    const userResponse: catlightCore.User = {
+      name: currentUser.name ?? currentUser.login,
+      id: currentUser.id,
+    };
 
     const repos = await this.repos.listForToken(currentUser.token);
     const allWorkflowRuns = await this.getAllWorkflowRuns(currentUser.token, repos);

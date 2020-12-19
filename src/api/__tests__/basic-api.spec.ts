@@ -3,10 +3,10 @@ import { ApiTestTools, TEST_SETTINGS, TestAgent } from '../__testTools__/ApiTest
 import { BuildDefinition, Space } from '../../catlight-protocol/basic';
 import { RepoName, Workflow } from '../../domain/IRepoRepository';
 import { BasicBuildInfoResponse } from '../api-types';
+import { Fixtures } from '../__testTools__/Fixtures';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
 import { InMemoryWorkflowRunRepository } from '../../infra/memory/InMemoryWorkflowRunRepository';
-import { UserWithScopes } from '../../domain/IUserRepository';
 import { WorkflowRun } from '../../domain/IWorkflowRunRepository';
 
 describe('/basic', () => {
@@ -20,7 +20,7 @@ describe('/basic', () => {
 
     test('should return a 403 status code when token misses "repo" scope', async () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: [] };
+      const user = Fixtures.userWithScopes([]);
       const userRepo = new InMemoryUserRepository();
       userRepo.addUser(token, user);
 
@@ -33,7 +33,7 @@ describe('/basic', () => {
 
     describe('with token of existing user', () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: ['repo'] };
+      const user = Fixtures.userWithScopes(['repo']);
       const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;
@@ -84,7 +84,7 @@ describe('/basic', () => {
         const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as BasicBuildInfoResponse;
-        expect(body.currentUser).toEqual({ id: user.id, name: user.login });
+        expect(body.currentUser).toEqual({ id: user.id, name: user.name });
       });
 
       test('should return spaces of user', async () => {

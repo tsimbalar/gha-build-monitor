@@ -177,14 +177,18 @@ components:
             properties:
                 id:
                     type: string
+                login:
+                    type: string
                 name:
                     type: string
+                    nullable: true
                 scopes:
                     items:
                         type: string
                     type: array
             required:
                 - id
+                - login
                 - name
                 - scopes
             type: object
@@ -391,7 +395,7 @@ components:
             bearerFormat: JWT
 info:
     title: gha-build-monitor
-    version: 0.2.0
+    version: 0.3.0
     description: 'Adapter to give access to GitHub Actions status via the CatLight Protocol'
     license:
         name: MIT

@@ -51,7 +51,8 @@ export class BearerAuthenticationProvider implements IAuthenticationProvider {
 
     return {
       id: user.id,
-      name: user.login,
+      name: user.name,
+      login: user.login,
       token,
       tokenScopes: user.scopes,
     };

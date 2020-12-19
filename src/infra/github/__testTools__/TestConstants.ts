@@ -1,7 +1,7 @@
 import { Repo, RepoName, Workflow } from '../../../domain/IRepoRepository';
 import { User } from '../../../domain/IUserRepository';
 
-export const THIS_REPO_OWNER: User = { id: '160544', login: 'tsimbalar' };
+export const THIS_REPO_OWNER: User = { id: '160544', login: 'tsimbalar', name: 'Thibaud Desodt' };
 
 export const THIS_REPO_NAME = new RepoName(THIS_REPO_OWNER.login, 'gha-build-monitor');
 

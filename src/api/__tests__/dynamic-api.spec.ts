@@ -7,11 +7,10 @@ import {
   DynamicFilteredBuildInfoResponse,
 } from '../api-types';
 import { RepoName, Workflow } from '../../domain/IRepoRepository';
-
+import { Fixtures } from '../__testTools__/Fixtures';
 import { InMemoryRepoRepository } from '../../infra/memory/InMemoryRepoRepository';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
 import { InMemoryWorkflowRunRepository } from '../../infra/memory/InMemoryWorkflowRunRepository';
-import { UserWithScopes } from '../../domain/IUserRepository';
 import { ValidationErrorJson } from '../middleware/schema-validation';
 import { WorkflowRun } from '../../domain/IWorkflowRunRepository';
 
@@ -26,7 +25,7 @@ describe('/dynamic', () => {
 
     test('should return a 403 status code when token misses "repo" scope', async () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: [] };
+      const user = Fixtures.userWithScopes([]);
       const userRepo = new InMemoryUserRepository();
       userRepo.addUser(token, user);
 
@@ -39,14 +38,15 @@ describe('/dynamic', () => {
 
     describe('with token of existing user', () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: ['repo'] };
+      const user = Fixtures.userWithScopes(['repo']);
       const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;
+      let userRepo: InMemoryUserRepository;
       let workflowRunRepo: InMemoryWorkflowRunRepository;
 
       beforeEach(() => {
-        const userRepo = new InMemoryUserRepository();
+        userRepo = new InMemoryUserRepository();
         userRepo.addUser(token, user);
 
         repoRepo = new InMemoryRepoRepository();
@@ -90,7 +90,20 @@ describe('/dynamic', () => {
         const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as DynamicBuildInfoMetadataResponse;
-        expect(body.currentUser).toEqual({ id: user.id, name: user.login });
+        expect(body.currentUser).toEqual({ id: user.id, name: user.name });
+      });
+
+      test('should return login when user has no name', async () => {
+        const userWithNoName = Fixtures.userWithScopes(['repo'], { name: null });
+        const theToken = 'theToken';
+        userRepo.addUser(theToken, userWithNoName);
+        const response = await agent
+          .get('/dynamic')
+          .set('Authorization', `Bearer ${theToken}`)
+          .send();
+
+        const body = response.body as DynamicBuildInfoMetadataResponse;
+        expect(body.currentUser).toEqual({ id: userWithNoName.id, name: userWithNoName.login });
       });
 
       test('should return spaces of user', async () => {
@@ -174,7 +187,7 @@ describe('/dynamic', () => {
 
     test('should return a 403 status code when token misses "repo" scope', async () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: [] };
+      const user = Fixtures.userWithScopes([]);
       const userRepo = new InMemoryUserRepository();
       userRepo.addUser(token, user);
 
@@ -190,7 +203,7 @@ describe('/dynamic', () => {
 
     describe('with token of existing user', () => {
       const token = 'THIS_IS_THE_TOKEN';
-      const user: UserWithScopes = { id: 'USER_ID', login: 'USER_LOGIN', scopes: ['repo'] };
+      const user = Fixtures.userWithScopes(['repo']);
       const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;

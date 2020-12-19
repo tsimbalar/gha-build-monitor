@@ -13,6 +13,7 @@ import {
   WorkflowRun,
   WorkflowRunsPerBranch,
 } from '../../domain/IWorkflowRunRepository';
+import { IAuthenticatedUser } from '../auth/IAuthentication';
 import { ValidationErrorJson } from '../middleware/schema-validation';
 
 interface ServerInfo {
@@ -43,7 +44,7 @@ export class DynamicBuildInfoController extends Controller {
   ): Promise<DynamicBuildInfoMetadataResponse> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const currentUser = request.user!;
-    const userResponse: catlightCore.User = { name: currentUser.name, id: currentUser.id };
+    const userResponse = this.mapToUser(currentUser);
 
     const repos = await this.repos.listForToken(currentUser.token);
 
@@ -171,6 +172,13 @@ export class DynamicBuildInfoController extends Controller {
       name: `${repo.name} · ${workflow.name}`,
       folder: repo.fullName,
       webUrl: workflow.webUrl,
+    };
+  }
+
+  private mapToUser(authUser: IAuthenticatedUser): catlightCore.User {
+    return {
+      id: authUser.id,
+      name: authUser.name ?? authUser.login,
     };
   }
 }

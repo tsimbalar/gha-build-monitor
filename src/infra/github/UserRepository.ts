@@ -16,6 +16,7 @@ export class UserRepository implements IUserRepository {
     return {
       id: response.data.id.toString(),
       login: response.data.login,
+      name: response.data.name,
       scopes: userScopes,
     };
   }

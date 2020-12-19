@@ -1,5 +1,6 @@
 export interface User {
   readonly login: string;
+  readonly name: string | null;
   readonly id: string;
 }
 

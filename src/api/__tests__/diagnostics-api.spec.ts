@@ -1,7 +1,7 @@
 import { ApiTestTools, TestAgent } from '../__testTools__/ApiTestTools';
 import { HealthCheckResponse, WhoAmIResponse } from '../api-types';
+import { Fixtures } from '../__testTools__/Fixtures';
 import { InMemoryUserRepository } from '../../infra/memory/InMemoryUserRepository';
-import { UserWithScopes } from '../../domain/IUserRepository';
 
 describe('Public API /_/* (diagnostics)', () => {
   let agent: TestAgent;
@@ -45,11 +45,7 @@ describe('Public API /_/* (diagnostics)', () => {
     });
 
     test('should return expected body with 200 status when provided bearer token', async () => {
-      const existingUser: UserWithScopes = {
-        id: 'some_id',
-        login: 'the_login',
-        scopes: ['repo'],
-      };
+      const existingUser = Fixtures.userWithScopes(['scope1', 'scope2']);
       const token = 'THIS-IS-A-TOKEN';
       userRepo.addUser(token, existingUser);
       const response = await agent.get('/_/whoami').set('Authorization', `Bearer ${token}`).send();
@@ -57,7 +53,8 @@ describe('Public API /_/* (diagnostics)', () => {
       expect(response.type).toBe('application/json');
       expect(response.body).toEqual<WhoAmIResponse>({
         id: existingUser.id,
-        name: existingUser.login,
+        name: existingUser.name,
+        login: existingUser.login,
         scopes: existingUser.scopes,
       });
     });
