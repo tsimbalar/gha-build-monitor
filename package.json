@@ -12,8 +12,8 @@
     "check": "npm run tsoa:gen && npm run ts:check && npm run lint",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "start": "INSTALLATION_ID=installation_id_guid node dist/index.js",
-    "start:dev": "INSTALLATION_ID=installation_id_guid  concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
+    "start": "INSTALLATION_ID=installation_id_guid HTTP_PORT=9900 node dist/index.js",
+    "start:dev": "INSTALLATION_ID=installation_id_guid HTTP_PORT=9900 concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
     "test": "jest",
     "ts:check": "tsc --noEmit --noErrorTruncation ",
     "tsoa:gen": "tsoa spec-and-routes"

@@ -8,7 +8,7 @@ const settings = loadSettingsFromEnvVars();
 const compositionRoot = CompositionRoot.forProd(settings);
 const app = buildWebApp(compositionRoot);
 
-const port = 9901;
+const port = settings.http.port;
 
 // eslint-disable-next-line no-console
 app.listen(port, () => console.log(`app listening at http://localhost:${port}`));
