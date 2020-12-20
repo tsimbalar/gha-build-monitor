@@ -13,9 +13,8 @@ export interface WorkflowRun {
   readonly name?: string;
   readonly webUrl: string;
   readonly status: WorkflowRunStatus;
-
+  readonly event: string;
   readonly startTime: Date;
-
   readonly finishTime?: Date;
 }
 

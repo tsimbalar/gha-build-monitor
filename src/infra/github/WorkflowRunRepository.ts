@@ -34,6 +34,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
       workflow_id: workflowId,
     })) {
       for (const run of response.data) {
+        const branchKey = this.getBranchKey(run);
         const runStartTime = parseISO(run.created_at);
 
         if (runStartTime <= nDaysAgo) {
@@ -43,7 +44,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
           continue;
         }
 
-        const currentForBranch = result.get(run.head_branch) || [];
+        const currentForBranch = result.get(branchKey) || [];
 
         if (currentForBranch.length >= filter.maxRunsPerBranch) {
           // skipping this run because we already have enough builds for this branch
@@ -55,13 +56,14 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
         const workflowRun: WorkflowRun = {
           id: run.id.toString(),
           webUrl: run.html_url,
-          name: `${run.event}`,
+          name: run.name,
           startTime: parseISO(run.created_at),
           status,
           finishTime: parseISO(run.updated_at),
+          event: run.event,
         };
 
-        result.set(run.head_branch, [workflowRun, ...currentForBranch]);
+        result.set(branchKey, [workflowRun, ...currentForBranch]);
       }
 
       if (!shouldAskMorePages) {
@@ -70,6 +72,16 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
     }
 
     return result;
+  }
+
+  private getBranchKey(run: { head_branch: string; event: string }): string {
+    if (run.event === 'push') {
+      return run.head_branch;
+    }
+    if (run.event === 'pull_request') {
+      return `PR#${run.head_branch}`;
+    }
+    return `${run.event}#${run.head_branch}`;
   }
 
   private parseWorkflowRunStatus(runStatus: string, runConclusion: string): WorkflowRunStatus {

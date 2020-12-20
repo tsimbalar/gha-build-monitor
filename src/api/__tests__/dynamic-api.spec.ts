@@ -324,6 +324,7 @@ describe('/dynamic', () => {
             startTime: new Date(),
             status: 'Queued',
             webUrl: 'http://....',
+            event: 'push',
           },
         ];
 
@@ -334,6 +335,7 @@ describe('/dynamic', () => {
             startTime: new Date(),
             status: 'Queued',
             webUrl: 'http://....',
+            event: 'push',
           },
         ];
 
