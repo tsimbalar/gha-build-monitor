@@ -13,6 +13,9 @@ export const TEST_SETTINGS: Settings = Object.freeze({
   catlight: {
     installationId: 'TEST_INSTALLATION_ID',
   },
+  http: {
+    port: 12345,
+  },
 });
 
 function getDependenciesForTesting(partial: Partial<ApiDependencies>): ApiDependencies {

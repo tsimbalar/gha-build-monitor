@@ -6,5 +6,8 @@ export function loadSettingsFromEnvVars(): Settings {
     catlight: {
       installationId: EnvVars.getString('INSTALLATION_ID'),
     },
+    http: {
+      port: EnvVars.getOptionalInteger('HTTP_PORT', 9901),
+    },
   };
 }

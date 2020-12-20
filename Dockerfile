@@ -27,6 +27,7 @@ FROM node:14.15.1-alpine
 ENV HOME_DIR /app
 ENV WHATAMI gha-build-monitor
 ENV NODE_ENV production
+ENV HTTP_PORT 9901
 
 # hadolint ignore=DL3018
 RUN apk --no-cache add ca-certificates
