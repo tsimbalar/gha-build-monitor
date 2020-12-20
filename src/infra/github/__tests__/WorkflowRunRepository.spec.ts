@@ -38,7 +38,39 @@ describe('WorkflowRunRepository', () => {
         status: expect.stringContaining(''),
         webUrl: expect.stringContaining('github.com'),
         finishTime: expect.anything(),
+        event: expect.stringContaining(''),
       });
+    });
+
+    test('should name branches according to triggering event', async () => {
+      const sut = new WorkflowRunRepository(octokitFactory);
+
+      const actual = await sut.getLatestRunsForWorkflow(
+        testCredentials.PAT_NO_SCOPE,
+        THIS_REPO_NAME,
+        THIS_REPO_MAIN_WORKFLOW.id,
+        {
+          maxAgeInDays: 10,
+          maxRunsPerBranch: 1,
+        }
+      );
+
+      expect([...actual.entries()]).not.toHaveLength(0);
+      const branchesForPRs = [...actual.entries()]
+        .filter(([branchName, runs]) => runs.find((r) => r.event === 'pull_request'))
+        .map((x) => x[0]);
+
+      for (const prBranch of branchesForPRs) {
+        expect(prBranch).toMatch('PR#');
+      }
+
+      const branchesForPushes = [...actual.entries()]
+        .filter(([branchName, runs]) => runs.find((r) => r.event === 'push'))
+        .map((x) => x[0]);
+
+      for (const prBranch of branchesForPushes) {
+        expect(prBranch).not.toMatch('PR#');
+      }
     });
 
     test('should sort builds from older to newer', async () => {

@@ -175,6 +175,7 @@ describe('/basic', () => {
             startTime: new Date(),
             status: 'Queued',
             webUrl: 'http://....',
+            event: 'push',
           },
         ];
 
@@ -185,6 +186,7 @@ describe('/basic', () => {
             startTime: new Date(),
             status: 'Queued',
             webUrl: 'http://....',
+            event: 'push',
           },
         ];
 
