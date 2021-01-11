@@ -2,6 +2,7 @@ import { ConstructorFunction, IControllerFactory } from './api/ioc/IControllerFa
 import { MetaInfo, meta as metaFromPackageJson } from './meta';
 import { BasicBuildInfoController } from './api/controllers/BasicBuildInfoController';
 import { BearerAuthenticationProvider } from './api/auth/BearerAuthenticationProvider';
+import { CachedRepoRepository } from './infra/caching/CachedRepoRepository';
 import { Controller } from '@tsoa/runtime';
 import { DiagnosticsController } from './api/controllers/DiagnosticsController';
 import { DynamicBuildInfoController } from './api/controllers/DynamicBuildInfoController';
@@ -10,6 +11,7 @@ import { IAuthentication } from './api/auth/IAuthentication';
 import { IRepoRepository } from './domain/IRepoRepository';
 import { IUserRepository } from './domain/IUserRepository';
 import { IWorkflowRunRepository } from './domain/IWorkflowRunRepository';
+import LRUCache from 'lru-cache';
 import { RepoRepository } from './infra/github/RepoRepository';
 import { Settings } from './settings-types';
 import { TsoaAuthentication } from './api/auth/TsoaAuthentication';
@@ -27,11 +29,22 @@ export interface ApiDependencies {
 }
 
 export class CompositionRoot implements IControllerFactory {
+  private readonly cache: LRUCache<string, any>;
+
+  private readonly dependencies: ApiDependencies;
+
   private constructor(
     private readonly settings: Settings,
     private readonly meta: MetaInfo,
-    private readonly dependencies: ApiDependencies
-  ) {}
+    dependencies: ApiDependencies
+  ) {
+    this.cache = new LRUCache<string, any>({});
+    this.dependencies = {
+      repoRepo: new CachedRepoRepository(this.cache, dependencies.repoRepo),
+      userRepo: dependencies.userRepo,
+      workflowRunRepo: dependencies.workflowRunRepo,
+    };
+  }
 
   public static forProd(settings: Settings): CompositionRoot {
     const octokitFactory = getOctokitFactory(metaFromPackageJson);
