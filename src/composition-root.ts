@@ -1,6 +1,5 @@
 import { ConstructorFunction, IControllerFactory } from './api/ioc/IControllerFactory';
 import { MetaInfo, meta as metaFromPackageJson } from './meta';
-import { BasicBuildInfoController } from './api/controllers/BasicBuildInfoController';
 import { BearerAuthenticationProvider } from './api/auth/BearerAuthenticationProvider';
 import { BuildInfoController } from './api/controllers/BuildInfoController';
 import { CachedRepoRepository } from './infra/caching/CachedRepoRepository';
@@ -64,16 +63,6 @@ export class CompositionRoot implements IControllerFactory {
     switch (controllerConstructor.name) {
       case ExampleController.name:
         return new ExampleController();
-      case BasicBuildInfoController.name:
-        return new BasicBuildInfoController(
-          {
-            id: `${SERVER_PREFIX}/${this.settings.catlight.installationId}`,
-            name: SERVER_NAME,
-            version: this.meta.version,
-          },
-          this.dependencies.repoRepo,
-          this.dependencies.workflowRunRepo
-        );
       case DynamicBuildInfoController.name:
         return new DynamicBuildInfoController(
           {

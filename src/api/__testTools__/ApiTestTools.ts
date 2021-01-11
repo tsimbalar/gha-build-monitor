@@ -20,7 +20,7 @@ export const TEST_SETTINGS: Settings = Object.freeze({
 
 function getDependenciesForTesting(partial: Partial<ApiDependencies>): ApiDependencies {
   return {
-    repoRepo: partial?.repoRepo ?? new InMemoryRepoRepository(),
+    repoRepo: partial.repoRepo ?? new InMemoryRepoRepository(),
     userRepo: partial.userRepo ?? new InMemoryUserRepository(),
     workflowRunRepo: partial.workflowRunRepo ?? new InMemoryWorkflowRunRepository(),
   };
