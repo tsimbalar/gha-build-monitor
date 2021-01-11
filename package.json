@@ -1,6 +1,6 @@
 {
   "name": "gha-build-monitor",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "buildInfo": {
     "commitSha": "_CI_GIT_COMMIT_SHA",
     "buildDate": "_CI_BUILD_DATE",
