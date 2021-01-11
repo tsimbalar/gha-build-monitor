@@ -14,7 +14,7 @@
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "start": "INSTALLATION_ID=installation_id_guid HTTP_PORT=9900 node dist/index.js",
     "start:dev": "INSTALLATION_ID=installation_id_guid HTTP_PORT=9900 concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
-    "test": "jest",
+    "test": "jest --testTimeout=15000",
     "ts:check": "tsc --noEmit --noErrorTruncation ",
     "tsoa:gen": "tsoa spec-and-routes"
   },
