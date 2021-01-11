@@ -159,40 +159,6 @@ components:
             additionalProperties: false
         BasicBuildInfoResponse:
             $ref: '#/components/schemas/Server'
-        HealthCheckResponse:
-            properties:
-                version:
-                    type: string
-                buildInfo:
-                    properties: {}
-                    additionalProperties:
-                        type: string
-                    type: object
-            required:
-                - version
-                - buildInfo
-            type: object
-            additionalProperties: false
-        WhoAmIResponse:
-            properties:
-                id:
-                    type: string
-                login:
-                    type: string
-                name:
-                    type: string
-                    nullable: true
-                scopes:
-                    items:
-                        type: string
-                    type: array
-            required:
-                - id
-                - login
-                - name
-                - scopes
-            type: object
-            additionalProperties: false
         BuildDefinitionMetadata:
             properties:
                 id:
@@ -387,6 +353,40 @@ components:
             additionalProperties: false
         DynamicFilteredBuildInfoRequest:
             $ref: '#/components/schemas/ServerStateRequest'
+        HealthCheckResponse:
+            properties:
+                version:
+                    type: string
+                buildInfo:
+                    properties: {}
+                    additionalProperties:
+                        type: string
+                    type: object
+            required:
+                - version
+                - buildInfo
+            type: object
+            additionalProperties: false
+        WhoAmIResponse:
+            properties:
+                id:
+                    type: string
+                login:
+                    type: string
+                name:
+                    type: string
+                    nullable: true
+                scopes:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - id
+                - login
+                - name
+                - scopes
+            type: object
+            additionalProperties: false
     securitySchemes:
         bearerAuth:
             type: http
@@ -418,6 +418,47 @@ paths:
                     bearerAuth:
                         - repo
             parameters: []
+    /builds:
+        get:
+            operationId: GetMetadata
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DynamicBuildInfoMetadataResponse'
+            security:
+                -
+                    bearerAuth:
+                        - repo
+            parameters: []
+        post:
+            operationId: GetServerState
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DynamicFilteredBuildInfoResponse'
+                '422':
+                    description: 'Validation error'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationErrorJson'
+            security:
+                -
+                    bearerAuth:
+                        - repo
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DynamicFilteredBuildInfoRequest'
     /_/healthcheck:
         get:
             operationId: GetHealthCheck
