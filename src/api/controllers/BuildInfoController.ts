@@ -14,13 +14,10 @@ import {
   WorkflowRunsPerBranch,
 } from '../../domain/IWorkflowRunRepository';
 import { IAuthenticatedUser } from '../auth/IAuthentication';
+import { MetaInfo } from '../../meta';
 import { ValidationErrorJson } from '../middleware/schema-validation';
 
-interface ServerInfo {
-  readonly id: string;
-  readonly name: string;
-  readonly version: string;
-}
+const SERVER_ID = 'github.com';
 
 interface BuildDefinitionAndRuns {
   readonly buildDefinition: catlightDynamic.BuildDefinitionStateRequest;
@@ -30,7 +27,7 @@ interface BuildDefinitionAndRuns {
 @Route('builds')
 export class BuildInfoController extends Controller {
   public constructor(
-    private readonly serverInfo: ServerInfo,
+    private readonly metaInfo: MetaInfo,
     private readonly repos: IRepoRepository,
     private readonly workflowRuns: IWorkflowRunRepository
   ) {
@@ -50,10 +47,10 @@ export class BuildInfoController extends Controller {
 
     return {
       protocol: 'https://catlight.io/protocol/v1.0/dynamic',
-      id: this.serverInfo.id,
-      name: this.serverInfo.name,
-      serverVersion: this.serverInfo.version,
-      webUrl: 'http://myserver.example/dashboard',
+      id: SERVER_ID,
+      name: 'GitHub Actions (via gha-build-monitor)',
+      serverVersion: this.metaInfo.version,
+      webUrl: 'https://github.com/tsimbalar/gha-build-monitor',
       currentUser: userResponse,
       spaces: repos.map((repo) => ({
         id: repo.name.fullName,
@@ -80,7 +77,7 @@ export class BuildInfoController extends Controller {
 
     return {
       protocol: 'https://catlight.io/protocol/v1.0/dynamic',
-      id: this.serverInfo.id,
+      id: SERVER_ID,
       spaces: filters.spaces.map((space) => ({
         id: space.id,
         name: space.id,

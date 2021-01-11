@@ -68,21 +68,13 @@ export class CompositionRoot implements IControllerFactory {
         return new ExampleController();
       case DynamicBuildInfoController.name:
         return new DynamicBuildInfoController(
-          {
-            id: `${SERVER_PREFIX}/${this.settings.catlight.installationId}`,
-            name: SERVER_NAME,
-            version: this.meta.version,
-          },
+          this.meta,
           this.dependencies.repoRepo,
           this.dependencies.workflowRunRepo
         );
       case BuildInfoController.name:
         return new BuildInfoController(
-          {
-            id: `${SERVER_PREFIX}/${this.settings.catlight.installationId}`,
-            name: SERVER_NAME,
-            version: this.meta.version,
-          },
+          this.meta,
           this.dependencies.repoRepo,
           this.dependencies.workflowRunRepo
         );

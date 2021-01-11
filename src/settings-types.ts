@@ -3,9 +3,8 @@ export interface Settings {
   readonly http: HttpSettings;
 }
 
-export interface CatLightSettings {
-  readonly installationId: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CatLightSettings {}
 
 export interface HttpSettings {
   readonly port: number;

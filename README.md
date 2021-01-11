@@ -6,11 +6,10 @@ Adapter to give access to GitHub Actions status via the [CatLight Protocol](http
 ## Getting started
 
 ### Starting the "proxy"
-- `INSTALLATION_ID` : something unique that represents your instance
 - by default, listening on port `9901`
 
 ```
-docker run --name gha-build-monitor -d -p 9901:9901 --env INSTALLATION_ID=whatever ghcr.io/tsimbalar/gha-build-monitor
+docker run --name gha-build-monitor -d -p 9901:9901 ghcr.io/tsimbalar/gha-build-monitor
 ```
 
 Open `http://localhost:9901/_/healthcheck` in a browser to check that the server is up and running.
@@ -27,7 +26,7 @@ In CatLight, you need to :
 - Add new connection
 - choose "CatLight-compatible"
 - To login choose : 
-  - Url : `http://localhost:9901/dynamic` (or another port if you chose it)
+  - Url : `http://localhost:9901/builds` (or another port if you chose it)
   - "Use token"
   - paste your PAT
 - Connect

@@ -39,7 +39,6 @@ describe('/dynamic', () => {
     describe('with token of existing user', () => {
       const token = 'THIS_IS_THE_TOKEN';
       const user = Fixtures.userWithScopes(['repo']);
-      const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;
       let userRepo: InMemoryUserRepository;
@@ -54,10 +53,7 @@ describe('/dynamic', () => {
 
         agent = ApiTestTools.createTestAgent(
           { userRepo, repoRepo, workflowRunRepo },
-          {
-            ...TEST_SETTINGS,
-            catlight: { ...TEST_SETTINGS.catlight, installationId },
-          }
+          { ...TEST_SETTINGS }
         );
       });
 
@@ -74,16 +70,16 @@ describe('/dynamic', () => {
         const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as DynamicBuildInfoMetadataResponse;
-        expect(body.id).toMatch(/^gha-build-monitor.*/u);
-        expect(body.name).toEqual('gha-build-monitor');
+        expect(body.id).toEqual('github.com');
+        expect(body.name).toMatch('gha-build-monitor');
         expect(body.serverVersion).toMatch(/[0-9]+.[0-9]+.[0-9]+/u);
       });
 
-      test('should have installationId in server id', async () => {
+      test('should have github.com as  server id', async () => {
         const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as DynamicBuildInfoMetadataResponse;
-        expect(body.id).toMatch(RegExp(`${installationId}$`, 'u'));
+        expect(body.id).toEqual('github.com');
       });
 
       test('should return current user information', async () => {
@@ -204,7 +200,6 @@ describe('/dynamic', () => {
     describe('with token of existing user', () => {
       const token = 'THIS_IS_THE_TOKEN';
       const user = Fixtures.userWithScopes(['repo']);
-      const installationId = 'THE_INSTALLATION_ID';
       let agent: TestAgent;
       let repoRepo: InMemoryRepoRepository;
       let workflowRunRepo: InMemoryWorkflowRunRepository;
@@ -218,10 +213,7 @@ describe('/dynamic', () => {
 
         agent = ApiTestTools.createTestAgent(
           { userRepo, repoRepo, workflowRunRepo },
-          {
-            ...TEST_SETTINGS,
-            catlight: { ...TEST_SETTINGS.catlight, installationId },
-          }
+          { ...TEST_SETTINGS }
         );
       });
 
@@ -280,24 +272,14 @@ describe('/dynamic', () => {
         expect(body.protocol).toBe('https://catlight.io/protocol/v1.0/dynamic');
       });
 
-      test('should identify server as gha-build-monitor', async () => {
+      test('should identify server as github.com', async () => {
         const response = await agent
           .post('/dynamic')
           .set('Authorization', `Bearer ${token}`)
           .send(VALID_MINIMAL_POST_PAYLOAD);
 
         const body = response.body as DynamicFilteredBuildInfoResponse;
-        expect(body.id).toMatch(/^gha-build-monitor.*/u);
-      });
-
-      test('should have installationId in server id', async () => {
-        const response = await agent
-          .post('/dynamic')
-          .set('Authorization', `Bearer ${token}`)
-          .send(VALID_MINIMAL_POST_PAYLOAD);
-
-        const body = response.body as DynamicFilteredBuildInfoResponse;
-        expect(body.id).toMatch(RegExp(`${installationId}$`, 'u'));
+        expect(body.id).toEqual('github.com');
       });
 
       test('should return details when a single build info is requested', async () => {

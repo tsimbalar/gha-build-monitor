@@ -1,4 +1,3 @@
-import * as catlightDynamic from '../../catlight-protocol/dynamic';
 import * as express from 'express';
 import {
   Body,
@@ -19,25 +18,20 @@ import {
 import { BuildInfoController } from './BuildInfoController';
 import { IRepoRepository } from '../../domain/IRepoRepository';
 import { IWorkflowRunRepository } from '../../domain/IWorkflowRunRepository';
+import { MetaInfo } from '../../meta';
 import { ValidationErrorJson } from '../middleware/schema-validation';
-
-interface ServerInfo {
-  readonly id: string;
-  readonly name: string;
-  readonly version: string;
-}
 
 @Route('dynamic')
 export class DynamicBuildInfoController extends Controller {
   private readonly realController: BuildInfoController;
 
   public constructor(
-    private readonly serverInfo: ServerInfo,
-    private readonly repos: IRepoRepository,
-    private readonly workflowRuns: IWorkflowRunRepository
+    metaInfo: MetaInfo,
+    repos: IRepoRepository,
+    workflowRuns: IWorkflowRunRepository
   ) {
     super();
-    this.realController = new BuildInfoController(serverInfo, repos, workflowRuns);
+    this.realController = new BuildInfoController(metaInfo, repos, workflowRuns);
   }
 
   @Deprecated()

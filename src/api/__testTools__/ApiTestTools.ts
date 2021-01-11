@@ -10,9 +10,7 @@ import supertest from 'supertest';
 export type TestAgent = supertest.SuperTest<supertest.Test>;
 
 export const TEST_SETTINGS: Settings = Object.freeze({
-  catlight: {
-    installationId: 'TEST_INSTALLATION_ID',
-  },
+  catlight: {},
   http: {
     port: 12345,
   },
