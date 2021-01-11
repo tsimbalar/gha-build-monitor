@@ -90,8 +90,8 @@ describe('/basic', () => {
       test('should return spaces of user', async () => {
         const repo1 = { id: '789', name: new RepoName('orgx', 'repoa'), webUrl: '', workflows: [] };
         const repo2 = { id: '123', name: new RepoName('orgx', 'repoz'), webUrl: '', workflows: [] };
-        repoRepo.addRepo(repo1);
-        repoRepo.addRepo(repo2);
+        repoRepo.addRepo(token, repo1);
+        repoRepo.addRepo(token, repo2);
         const response = await agent.get('/basic').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as BasicBuildInfoResponse;
@@ -123,7 +123,7 @@ describe('/basic', () => {
           webUrl: 'http://www.perdu2.com',
         };
         const repoName = new RepoName('orgx', 'repoz');
-        repoRepo.addRepo({
+        repoRepo.addRepo(token, {
           id: '123',
           name: repoName,
           webUrl: '',
@@ -155,7 +155,7 @@ describe('/basic', () => {
       test('should return build branches', async () => {
         const repoName = new RepoName('orgx', 'repoz');
         const workflowId = 'worflow-id';
-        repoRepo.addRepo({
+        repoRepo.addRepo(token, {
           id: '123',
           name: repoName,
           webUrl: '',

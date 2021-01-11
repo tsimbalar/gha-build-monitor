@@ -109,8 +109,8 @@ describe('/dynamic', () => {
       test('should return spaces of user', async () => {
         const repo1 = { id: '789', name: new RepoName('orgx', 'repoa'), webUrl: '', workflows: [] };
         const repo2 = { id: '123', name: new RepoName('orgx', 'repoz'), webUrl: '', workflows: [] };
-        repoRepo.addRepo(repo1);
-        repoRepo.addRepo(repo2);
+        repoRepo.addRepo(token, repo1);
+        repoRepo.addRepo(token, repo2);
         const response = await agent.get('/dynamic').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as DynamicBuildInfoMetadataResponse;
@@ -143,7 +143,7 @@ describe('/dynamic', () => {
           webUrl: 'http://www.perdu2.com',
         };
         const repoName = new RepoName(repoOwner, 'repoz');
-        repoRepo.addRepo({
+        repoRepo.addRepo(token, {
           id: '123',
           name: repoName,
           webUrl: '',
@@ -315,7 +315,7 @@ describe('/dynamic', () => {
           workflows: [workflow1],
         };
 
-        repoRepo.addRepo(repo1);
+        repoRepo.addRepo(token, repo1);
 
         const branch1 = 'master';
         const branch1Runs: WorkflowRun[] = [
