@@ -11,6 +11,7 @@ import { IAuthentication } from './api/auth/IAuthentication';
 import { IRepoRepository } from './domain/IRepoRepository';
 import { IUserRepository } from './domain/IUserRepository';
 import { IWorkflowRunRepository } from './domain/IWorkflowRunRepository';
+import { IndexController } from './api/controllers/IndexController';
 import LRUCache from 'lru-cache';
 import { RepoRepository } from './infra/github/RepoRepository';
 import { Settings } from './settings-types';
@@ -61,6 +62,8 @@ export class CompositionRoot implements IControllerFactory {
 
   public get<T>(controllerConstructor: ConstructorFunction<T>): Controller {
     switch (controllerConstructor.name) {
+      case IndexController.name:
+        return new IndexController(this.meta);
       case ExampleController.name:
         return new ExampleController();
       case DynamicBuildInfoController.name:
