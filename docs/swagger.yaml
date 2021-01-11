@@ -400,6 +400,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DynamicBuildInfoMetadataResponse'
+            deprecated: true
             security:
                 -
                     bearerAuth:
@@ -420,6 +421,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ValidationErrorJson'
+            deprecated: true
             security:
                 -
                     bearerAuth:
