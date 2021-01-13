@@ -8,6 +8,10 @@ export type WorkflowRunStatus =
   | 'Failed'
   | 'Canceled';
 
+export interface WorkflowRunAuthor {
+  readonly login: string;
+  readonly name: string;
+}
 export interface WorkflowRun {
   readonly id: string;
   readonly name?: string;
@@ -16,6 +20,7 @@ export interface WorkflowRun {
   readonly event: string;
   readonly startTime: Date;
   readonly finishTime?: Date;
+  readonly mainAuthor?: WorkflowRunAuthor;
 }
 
 export interface WorflowRunFilter {

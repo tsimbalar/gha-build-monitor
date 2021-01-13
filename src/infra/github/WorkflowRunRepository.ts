@@ -3,15 +3,21 @@ import {
   IWorkflowRunRepository,
   WorflowRunFilter,
   WorkflowRun,
+  WorkflowRunAuthor,
   WorkflowRunStatus,
   WorkflowRunsPerBranch,
 } from '../../domain/IWorkflowRunRepository';
+import { ICommitAuthorRepository } from './CommitAuthorRepository';
+import { Octokit } from '@octokit/rest';
 import { OctokitFactory } from './OctokitFactory';
 import { RepoName } from '../../domain/IRepoRepository';
 import { parseISO } from 'date-fns';
 
 export class WorkflowRunRepository implements IWorkflowRunRepository {
-  public constructor(private readonly octokitFactory: OctokitFactory) {}
+  public constructor(
+    private readonly octokitFactory: OctokitFactory,
+    private readonly commitAuthorRepo: ICommitAuthorRepository
+  ) {}
 
   public async getLatestRunsForWorkflow(
     token: string,
@@ -46,6 +52,8 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 
         const currentForBranch = result.get(branchKey) || [];
 
+        const isLatestRunInThisBranch = currentForBranch.length === 0;
+
         if (currentForBranch.length >= filter.maxRunsPerBranch) {
           // skipping this run because we already have enough builds for this branch
           // eslint-disable-next-line no-continue
@@ -53,6 +61,22 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
         }
 
         const status = this.parseWorkflowRunStatus(run.status, run.conclusion);
+        let author: WorkflowRunAuthor | undefined;
+        if (isLatestRunInThisBranch) {
+          // eslint-disable-next-line no-await-in-loop
+          const commitAuthor = await this.commitAuthorRepo.getAuthorForCommit(
+            token,
+            repoName,
+            run.head_commit.id
+          );
+
+          if (commitAuthor) {
+            author = {
+              login: commitAuthor.login,
+              name: commitAuthor.name ?? commitAuthor.login,
+            };
+          }
+        }
         const workflowRun: WorkflowRun = {
           id: run.id.toString(),
           webUrl: run.html_url,
@@ -61,6 +85,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
           status,
           finishTime: parseISO(run.updated_at),
           event: run.event,
+          mainAuthor: author,
         };
 
         result.set(branchKey, [workflowRun, ...currentForBranch]);

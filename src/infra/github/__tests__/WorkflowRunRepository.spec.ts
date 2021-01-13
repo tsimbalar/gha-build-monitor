@@ -1,18 +1,33 @@
+import {
+  CommitAuthor,
+  CommitAuthorRepository,
+  ICommitAuthorRepository,
+} from '../CommitAuthorRepository';
 import { THIS_REPO_MAIN_WORKFLOW, THIS_REPO_NAME } from '../__testTools__/TestConstants';
+import { WorkflowRun, WorkflowRunAuthor } from '../../../domain/IWorkflowRunRepository';
 import { RepoName } from '../../../domain/IRepoRepository';
-import { WorkflowRun } from '../../../domain/IWorkflowRunRepository';
 import { WorkflowRunRepository } from '../WorkflowRunRepository';
 import { getOctokitFactory } from '../OctokitFactory';
 import { testCredentials } from '../__testTools__/TestCredentials';
 
+class EmptyCommitAuthorRepo implements ICommitAuthorRepository {
+  public async getAuthorForCommit(
+    token: string,
+    repoName: RepoName,
+    commitId: string
+  ): Promise<CommitAuthor | null> {
+    return null;
+  }
+}
 describe('WorkflowRunRepository', () => {
   const octokitFactory = getOctokitFactory({
     version: 'v0-tests',
     buildInfo: {},
   });
+  const emptyCommitAutorRepo = new EmptyCommitAuthorRepo();
   describe('getLatestRunsForWorkflow', () => {
     test('should retrieve runs of public repo', async () => {
-      const sut = new WorkflowRunRepository(octokitFactory);
+      const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
         testCredentials.PAT_NO_SCOPE,
@@ -42,8 +57,37 @@ describe('WorkflowRunRepository', () => {
       });
     });
 
+    test('should retrieve authors of commits on public repo', async () => {
+      const sut = new WorkflowRunRepository(
+        octokitFactory,
+        new CommitAuthorRepository(octokitFactory)
+      );
+
+      const actual = await sut.getLatestRunsForWorkflow(
+        testCredentials.PAT_NO_SCOPE,
+        THIS_REPO_NAME,
+        THIS_REPO_MAIN_WORKFLOW.id,
+        {
+          maxAgeInDays: 10,
+          maxRunsPerBranch: 1,
+        }
+      );
+
+      expect([...actual.entries()]).not.toHaveLength(0);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const runsOfBranchMain = actual.get('main')!;
+      expect(runsOfBranchMain).toBeDefined();
+      expect(runsOfBranchMain).not.toHaveLength(0);
+
+      const actualRun = runsOfBranchMain[0];
+      expect(actualRun.mainAuthor).toEqual<WorkflowRunAuthor>({
+        login: expect.stringContaining(''),
+        name: expect.stringContaining(''),
+      });
+    }, 20000);
+
     test('should name branches according to triggering event', async () => {
-      const sut = new WorkflowRunRepository(octokitFactory);
+      const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
         testCredentials.PAT_NO_SCOPE,
@@ -74,7 +118,7 @@ describe('WorkflowRunRepository', () => {
     });
 
     test('should sort builds from older to newer', async () => {
-      const sut = new WorkflowRunRepository(octokitFactory);
+      const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
         testCredentials.PAT_NO_SCOPE,
@@ -97,7 +141,7 @@ describe('WorkflowRunRepository', () => {
 
     test('should apply maxAgeInDays', async () => {
       const maxAgeInDays = 3;
-      const sut = new WorkflowRunRepository(octokitFactory);
+      const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
         testCredentials.PAT_NO_SCOPE,
@@ -119,7 +163,7 @@ describe('WorkflowRunRepository', () => {
 
     test('should apply maxRunsPerBranch in repo with lots of activity', async () => {
       const maxRunsPerBranch = 2;
-      const sut = new WorkflowRunRepository(octokitFactory);
+      const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
         testCredentials.PAT_NO_SCOPE,
