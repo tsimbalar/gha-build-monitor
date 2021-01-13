@@ -86,7 +86,7 @@ describe('/builds', () => {
         const response = await agent.get('/builds').set('Authorization', `Bearer ${token}`).send();
 
         const body = response.body as DynamicBuildInfoMetadataResponse;
-        expect(body.currentUser).toEqual({ id: user.id, name: user.name });
+        expect(body.currentUser).toEqual({ id: user.login, name: user.name });
       });
 
       test('should return login when user has no name', async () => {
@@ -99,7 +99,7 @@ describe('/builds', () => {
           .send();
 
         const body = response.body as DynamicBuildInfoMetadataResponse;
-        expect(body.currentUser).toEqual({ id: userWithNoName.id, name: userWithNoName.login });
+        expect(body.currentUser).toEqual({ id: userWithNoName.login, name: userWithNoName.login });
       });
 
       test('should return spaces of user', async () => {

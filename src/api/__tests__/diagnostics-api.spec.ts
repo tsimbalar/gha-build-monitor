@@ -52,7 +52,6 @@ describe('Public API /_/* (diagnostics)', () => {
       expect(response.status).toBe(200);
       expect(response.type).toBe('application/json');
       expect(response.body).toEqual<WhoAmIResponse>({
-        id: existingUser.id,
         name: existingUser.name,
         login: existingUser.login,
         scopes: existingUser.scopes,
