@@ -14,7 +14,6 @@ export interface HealthCheckResponse {
 }
 
 export interface WhoAmIResponse {
-  readonly id: string;
   readonly login: string;
   readonly name: string | null;
   readonly scopes: string[];

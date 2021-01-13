@@ -14,7 +14,6 @@ export class UserRepository implements IUserRepository {
       .filter((x) => x !== '');
 
     return {
-      id: response.data.id.toString(),
       login: response.data.login,
       name: response.data.name,
       scopes: userScopes,

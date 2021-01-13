@@ -287,8 +287,6 @@ components:
             additionalProperties: false
         WhoAmIResponse:
             properties:
-                id:
-                    type: string
                 login:
                     type: string
                 name:
@@ -299,7 +297,6 @@ components:
                         type: string
                     type: array
             required:
-                - id
                 - login
                 - name
                 - scopes

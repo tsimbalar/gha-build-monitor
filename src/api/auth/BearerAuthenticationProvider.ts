@@ -50,7 +50,6 @@ export class BearerAuthenticationProvider implements IAuthenticationProvider {
     const user = await this.users.getUserFromToken(token);
 
     return {
-      id: user.id,
       name: user.name,
       login: user.login,
       token,

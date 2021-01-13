@@ -174,7 +174,7 @@ export class BuildInfoController extends Controller {
 
   private mapToUser(authUser: IAuthenticatedUser): catlightCore.User {
     return {
-      id: authUser.id,
+      id: authUser.login,
       name: authUser.name ?? authUser.login,
     };
   }

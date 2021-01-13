@@ -29,7 +29,6 @@ export class DiagnosticsController extends Controller {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const currentUser = request.user!;
     return {
-      id: currentUser.id,
       name: currentUser.name,
       login: currentUser.login,
       scopes: currentUser.tokenScopes,

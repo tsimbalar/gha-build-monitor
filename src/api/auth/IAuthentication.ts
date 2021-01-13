@@ -1,7 +1,6 @@
 import { Request } from 'express';
 
 export interface IAuthenticatedUser {
-  readonly id: string;
   readonly login: string;
   readonly name: string | null;
   readonly token: string;
