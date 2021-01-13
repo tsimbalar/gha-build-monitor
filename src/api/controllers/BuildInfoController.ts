@@ -149,15 +149,26 @@ export class BuildInfoController extends Controller {
   }
 
   private mapToBuild(run: WorkflowRun): catlightCore.Build {
-    return {
+    let result: catlightCore.Build = {
       id: run.id,
       startTime: run.startTime,
       status: run.status,
       finishTime: run.finishTime,
       name: run.name,
       webUrl: run.webUrl,
+
       // TODO: contributors, triggeredByUser
     };
+    if (run.mainAuthor) {
+      result = {
+        ...result,
+        triggeredByUser: {
+          id: run.mainAuthor.login,
+          name: run.mainAuthor.name,
+        },
+      };
+    }
+    return result;
   }
 
   private mapToBuildDefinitionMetadata(

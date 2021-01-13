@@ -3,6 +3,7 @@ import { MetaInfo, meta as metaFromPackageJson } from './meta';
 import { BearerAuthenticationProvider } from './api/auth/BearerAuthenticationProvider';
 import { BuildInfoController } from './api/controllers/BuildInfoController';
 import { CachedRepoRepository } from './infra/caching/CachedRepoRepository';
+import { CommitAuthorRepository } from './infra/github/CommitAuthorRepository';
 import { Controller } from '@tsoa/runtime';
 import { DiagnosticsController } from './api/controllers/DiagnosticsController';
 import { DynamicBuildInfoController } from './api/controllers/DynamicBuildInfoController';
@@ -52,7 +53,10 @@ export class CompositionRoot implements IControllerFactory {
     return new CompositionRoot(settings, metaFromPackageJson, {
       userRepo: new UserRepository(octokitFactory),
       repoRepo: new RepoRepository(octokitFactory),
-      workflowRunRepo: new WorkflowRunRepository(octokitFactory),
+      workflowRunRepo: new WorkflowRunRepository(
+        octokitFactory,
+        new CommitAuthorRepository(octokitFactory)
+      ),
     });
   }
 
