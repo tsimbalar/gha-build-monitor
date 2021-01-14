@@ -14,7 +14,6 @@ import { IRepoRepository } from './domain/IRepoRepository';
 import { IUserRepository } from './domain/IUserRepository';
 import { IWorkflowRunRepository } from './domain/IWorkflowRunRepository';
 import { IndexController } from './api/controllers/IndexController';
-import LRUCache from 'lru-cache';
 import { RepoRepository } from './infra/github/RepoRepository';
 import { Settings } from './settings-types';
 import { TsoaAuthentication } from './api/auth/TsoaAuthentication';
@@ -29,8 +28,6 @@ export interface ApiDependencies {
 }
 
 export class CompositionRoot implements IControllerFactory {
-  private readonly cache: LRUCache<string, any>;
-
   private readonly dependencies: ApiDependencies;
 
   private constructor(
@@ -38,9 +35,8 @@ export class CompositionRoot implements IControllerFactory {
     private readonly meta: MetaInfo,
     dependencies: ApiDependencies
   ) {
-    this.cache = new LRUCache<string, any>({});
     this.dependencies = {
-      repoRepo: new CachedRepoRepository(this.cache, dependencies.repoRepo),
+      repoRepo: new CachedRepoRepository(dependencies.repoRepo),
       userRepo: dependencies.userRepo,
       workflowRunRepo: dependencies.workflowRunRepo,
     };
@@ -53,10 +49,7 @@ export class CompositionRoot implements IControllerFactory {
       repoRepo: new RepoRepository(octokitFactory),
       workflowRunRepo: new WorkflowRunRepository(
         octokitFactory,
-        new CachedCommitAuthorRepository(
-          new LRUCache<string, any>({}),
-          new CommitAuthorRepository(octokitFactory)
-        )
+        new CachedCommitAuthorRepository(new CommitAuthorRepository(octokitFactory))
       ),
     });
   }

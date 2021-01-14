@@ -21,7 +21,7 @@ describe('CachedRepoRepository', () => {
       const wrapped = new InMemoryRepoRepository();
       wrapped.addRepo(token1, existingRepo);
 
-      const sut = new CachedRepoRepository(new LRUCache<string, any>(), wrapped);
+      const sut = new CachedRepoRepository(wrapped);
 
       const actual = await sut.listForToken(token1);
 
@@ -33,7 +33,7 @@ describe('CachedRepoRepository', () => {
       const wrapped = new InMemoryRepoRepository();
 
       const spy = jest.spyOn(wrapped, 'listForToken');
-      const sut = new CachedRepoRepository(new LRUCache<string, any>(), wrapped);
+      const sut = new CachedRepoRepository(wrapped);
 
       const actual1 = await sut.listForToken(token);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -73,7 +73,7 @@ describe('CachedRepoRepository', () => {
       };
       wrapped.addRepo(token1, existingRepo1);
 
-      const sut = new CachedRepoRepository(new LRUCache<string, any>(), wrapped);
+      const sut = new CachedRepoRepository(wrapped);
 
       const actualForToken1 = await sut.listForToken(token1);
 
