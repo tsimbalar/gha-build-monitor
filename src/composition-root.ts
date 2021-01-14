@@ -2,6 +2,7 @@ import { ConstructorFunction, IControllerFactory } from './api/ioc/IControllerFa
 import { MetaInfo, meta as metaFromPackageJson } from './meta';
 import { BearerAuthenticationProvider } from './api/auth/BearerAuthenticationProvider';
 import { BuildInfoController } from './api/controllers/BuildInfoController';
+import { CachedCommitAuthorRepository } from './infra/caching/CachedCommitAuthorRepository';
 import { CachedRepoRepository } from './infra/caching/CachedRepoRepository';
 import { CommitAuthorRepository } from './infra/github/CommitAuthorRepository';
 import { Controller } from '@tsoa/runtime';
@@ -20,9 +21,6 @@ import { TsoaAuthentication } from './api/auth/TsoaAuthentication';
 import { UserRepository } from './infra/github/UserRepository';
 import { WorkflowRunRepository } from './infra/github/WorkflowRunRepository';
 import { getOctokitFactory } from './infra/github/OctokitFactory';
-
-const SERVER_PREFIX = 'gha-build-monitor';
-const SERVER_NAME = 'gha-build-monitor';
 
 export interface ApiDependencies {
   readonly userRepo: IUserRepository;
@@ -55,7 +53,10 @@ export class CompositionRoot implements IControllerFactory {
       repoRepo: new RepoRepository(octokitFactory),
       workflowRunRepo: new WorkflowRunRepository(
         octokitFactory,
-        new CommitAuthorRepository(octokitFactory)
+        new CachedCommitAuthorRepository(
+          new LRUCache<string, any>({}),
+          new CommitAuthorRepository(octokitFactory)
+        )
       ),
     });
   }
