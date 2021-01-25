@@ -41,7 +41,7 @@
     "@types/node": "14.14.22",
     "@types/supertest": "2.0.10",
     "@types/swagger-ui-express": "4.1.2",
-    "@typescript-eslint/eslint-plugin": "4.13.0",
+    "@typescript-eslint/eslint-plugin": "4.14.0",
     "@typescript-eslint/parser": "4.14.0",
     "concurrently": "5.3.0",
     "eslint": "7.18.0",
