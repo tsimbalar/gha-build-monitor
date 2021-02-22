@@ -13,7 +13,7 @@ To use `gha-build-monitor` to monitor your GitHub Actions workflows, follow thes
 ### 1. Start the "proxy" locally
 
 ```
-docker run --name gha-build-monitor -d -p 9901:9901 ghcr.io/tsimbalar/gha-build-monitor
+docker run --name gha-build-monitor -d -p 9901:9901 --restart unless-stopped ghcr.io/tsimbalar/gha-build-monitor
 ```
 
 Open `http://localhost:9901/` in a browser to check that the server is up and running.
