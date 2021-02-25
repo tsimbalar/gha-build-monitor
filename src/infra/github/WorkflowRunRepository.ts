@@ -7,16 +7,27 @@ import {
   WorkflowRunStatus,
   WorkflowRunsPerBranch,
 } from '../../domain/IWorkflowRunRepository';
-import { ICommitAuthorRepository } from './CommitAuthorRepository';
-import { Octokit } from '@octokit/rest';
+import { BaseCommitAuthorRepository } from './CommitAuthorRepository';
 import { OctokitFactory } from './OctokitFactory';
 import { RepoName } from '../../domain/IRepoRepository';
 import { parseISO } from 'date-fns';
 
+interface WorkflowRunInfo {
+  readonly id: string;
+  readonly name?: string;
+  readonly webUrl: string;
+  readonly runStatus: string;
+  readonly runConclusion: string;
+  readonly event: string;
+  readonly startTime: Date;
+  readonly finishTime?: Date;
+  readonly commitId: string;
+}
+
 export class WorkflowRunRepository implements IWorkflowRunRepository {
   public constructor(
     private readonly octokitFactory: OctokitFactory,
-    private readonly commitAuthorRepo: ICommitAuthorRepository
+    private readonly commitAuthorRepo: BaseCommitAuthorRepository
   ) {}
 
   public async getLatestRunsForWorkflow(
@@ -30,7 +41,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 
     const octokit = this.octokitFactory(token);
 
-    const result = new Map<string, ReadonlyArray<WorkflowRun>>();
+    const result = new Map<string, ReadonlyArray<WorkflowRunInfo>>();
 
     let shouldAskMorePages = true;
 
@@ -52,40 +63,22 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 
         const currentForBranch = result.get(branchKey) || [];
 
-        const isLatestRunInThisBranch = currentForBranch.length === 0;
-
         if (currentForBranch.length >= filter.maxRunsPerBranch) {
           // skipping this run because we already have enough builds for this branch
           // eslint-disable-next-line no-continue
           continue;
         }
 
-        const status = this.parseWorkflowRunStatus(run.status, run.conclusion);
-        let author: WorkflowRunAuthor | undefined;
-        if (isLatestRunInThisBranch) {
-          // eslint-disable-next-line no-await-in-loop
-          const commitAuthor = await this.commitAuthorRepo.getAuthorForCommit(
-            token,
-            repoName,
-            run.head_commit.id
-          );
-
-          if (commitAuthor) {
-            author = {
-              login: commitAuthor.login,
-              name: commitAuthor.name ?? commitAuthor.login,
-            };
-          }
-        }
-        const workflowRun: WorkflowRun = {
+        const workflowRun: WorkflowRunInfo = {
           id: run.id.toString(),
           webUrl: run.html_url,
           name: run.name,
           startTime: parseISO(run.created_at),
-          status,
+          runStatus: run.status,
+          runConclusion: run.conclusion,
           finishTime: parseISO(run.updated_at),
           event: run.event,
-          mainAuthor: author,
+          commitId: run.head_commit.id,
         };
 
         result.set(branchKey, [workflowRun, ...currentForBranch]);
@@ -96,7 +89,9 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
       }
     }
 
-    return result;
+    const mappedResults = await this.mapToWorkflowRunsPerBranch(token, repoName, result);
+
+    return mappedResults;
   }
 
   private getBranchKey(run: { head_branch: string; event: string }): string {
@@ -107,6 +102,48 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
       return `PR#${run.head_branch}`;
     }
     return `${run.event}#${run.head_branch}`;
+  }
+
+  private async mapToWorkflowRunsPerBranch(
+    token: string,
+    repoName: RepoName,
+    input: Map<string, ReadonlyArray<WorkflowRunInfo>>
+  ): Promise<WorkflowRunsPerBranch> {
+    const lastCommitForEachRunInBranch = [
+      ...new Set([...input.values()].map((runs) => runs[0].commitId)),
+    ];
+    const commitAuthorsPerCommitId = await this.commitAuthorRepo.getAuthorsForCommits(
+      token,
+      repoName,
+      lastCommitForEachRunInBranch
+    );
+
+    return new Map<string, readonly WorkflowRun[]>(
+      [...input.entries()].map(([k, v]) => [
+        k,
+        v.map<WorkflowRun>((info) => {
+          let author: WorkflowRunAuthor | undefined;
+          const commitAuthor = commitAuthorsPerCommitId.get(info.commitId);
+          if (commitAuthor) {
+            author = {
+              login: commitAuthor.login,
+              name: commitAuthor.name ?? commitAuthor.login,
+            };
+          }
+
+          return {
+            event: info.event,
+            id: info.id,
+            startTime: info.startTime,
+            webUrl: info.webUrl,
+            finishTime: info.finishTime,
+            name: info.name,
+            status: this.parseWorkflowRunStatus(info.runStatus, info.runConclusion),
+            mainAuthor: author,
+          };
+        }),
+      ])
+    );
   }
 
   private parseWorkflowRunStatus(runStatus: string, runConclusion: string): WorkflowRunStatus {

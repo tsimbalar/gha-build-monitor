@@ -3,10 +3,9 @@ import LRUCache from 'lru-cache';
 import { createHash } from 'crypto';
 
 export class CachedRepoRepository implements IRepoRepository {
-  public constructor(
-    private readonly cache: LRUCache<string, any>,
-    private readonly wrapped: IRepoRepository
-  ) {}
+  private readonly cache = new LRUCache<string, any>();
+
+  public constructor(private readonly wrapped: IRepoRepository) {}
 
   public async listForToken(token: string): Promise<ReadonlyArray<Repo>> {
     const tokenHash = createHash('sha1').update(token).digest('base64');

@@ -1,7 +1,7 @@
 import {
+  BaseCommitAuthorRepository,
   CommitAuthor,
   CommitAuthorRepository,
-  ICommitAuthorRepository,
 } from '../CommitAuthorRepository';
 import { THIS_REPO_MAIN_WORKFLOW, THIS_REPO_NAME } from '../__testTools__/TestConstants';
 import { WorkflowRun, WorkflowRunAuthor } from '../../../domain/IWorkflowRunRepository';
@@ -10,7 +10,7 @@ import { WorkflowRunRepository } from '../WorkflowRunRepository';
 import { getOctokitFactory } from '../OctokitFactory';
 import { testCredentials } from '../__testTools__/TestCredentials';
 
-class EmptyCommitAuthorRepo implements ICommitAuthorRepository {
+class EmptyCommitAuthorRepo extends BaseCommitAuthorRepository {
   public async getAuthorForCommit(
     token: string,
     repoName: RepoName,
