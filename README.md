@@ -63,3 +63,4 @@ This is still an early version (`v0.*`).
 Here are some things that will probably be added before v1 :
 
 - retrieving authors/contributors of each workflow run
+
