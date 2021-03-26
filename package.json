@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/tsimbalar/gha-build-monitor#readme",
   "devDependencies": {
-    "@tsoa/cli": "3.5.2",
+    "@tsoa/cli": "3.6.1",
     "@types/express": "4.17.11",
     "@types/jest": "26.0.20",
     "@types/lru-cache": "5.1.0",
