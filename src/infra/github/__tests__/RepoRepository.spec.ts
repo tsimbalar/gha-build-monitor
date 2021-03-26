@@ -15,7 +15,7 @@ describe('RepoRepository', () => {
     buildInfo: {},
   });
   describe('listForToken', () => {
-    test('should return only public repos when using "no scope" token', async () => {
+    test('should return only public repos when using "no scope" token #needs-secrets', async () => {
       const sut = new RepoRepository(octokitFactory);
 
       const actual = await sut.listForToken(testCredentials.PAT_NO_SCOPE);
@@ -35,7 +35,7 @@ describe('RepoRepository', () => {
       expect(reposWithoutTsimbalar).toHaveLength(0);
     });
 
-    test('should return all repos across multiple organizations when using token with scope "repo"', async () => {
+    test('should return all repos across multiple organizations when using token with scope "repo" #needs-secrets', async () => {
       const sut = new RepoRepository(octokitFactory);
 
       const actual = await sut.listForToken(testCredentials.PAT_SCOPE_REPO);

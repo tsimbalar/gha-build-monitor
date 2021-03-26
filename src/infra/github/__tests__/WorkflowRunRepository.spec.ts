@@ -26,7 +26,7 @@ describe('WorkflowRunRepository', () => {
   });
   const emptyCommitAutorRepo = new EmptyCommitAuthorRepo();
   describe('getLatestRunsForWorkflow', () => {
-    test('should retrieve runs of public repo', async () => {
+    test('should retrieve runs of public repo #needs-secrets', async () => {
       const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
@@ -57,7 +57,7 @@ describe('WorkflowRunRepository', () => {
       });
     });
 
-    test('should retrieve authors of commits on public repo', async () => {
+    test('should retrieve authors of commits on public repo #needs-secrets', async () => {
       const sut = new WorkflowRunRepository(
         octokitFactory,
         new CommitAuthorRepository(octokitFactory)
@@ -86,7 +86,7 @@ describe('WorkflowRunRepository', () => {
       });
     }, 20000);
 
-    test('should name branches according to triggering event', async () => {
+    test('should name branches according to triggering event #needs-secrets', async () => {
       const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
@@ -117,7 +117,7 @@ describe('WorkflowRunRepository', () => {
       }
     });
 
-    test('should sort builds from older to newer', async () => {
+    test('should sort builds from older to newer #needs-secrets', async () => {
       const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
       const actual = await sut.getLatestRunsForWorkflow(
@@ -139,7 +139,7 @@ describe('WorkflowRunRepository', () => {
       expect(oldestRun.startTime.getTime()).toBeLessThan(secondOldestRun.startTime.getTime());
     });
 
-    test('should apply maxAgeInDays', async () => {
+    test('should apply maxAgeInDays #needs-secrets', async () => {
       const maxAgeInDays = 3;
       const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 
@@ -161,7 +161,7 @@ describe('WorkflowRunRepository', () => {
       expect(oldestRun.startTime.getTime()).toBeGreaterThan(nDaysAgo.getTime());
     });
 
-    test('should apply maxRunsPerBranch in repo with lots of activity', async () => {
+    test('should apply maxRunsPerBranch in repo with lots of activity #needs-secrets', async () => {
       const maxRunsPerBranch = 2;
       const sut = new WorkflowRunRepository(octokitFactory, emptyCommitAutorRepo);
 

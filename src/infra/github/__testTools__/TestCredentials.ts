@@ -7,7 +7,7 @@ try {
   realSecrets = require('./secrets').SECRETS;
   // eslint-disable-next-line no-empty
 } catch {
-  realSecrets = EnvVars.getJson<Partial<Secrets>>('TEST_CREDENTIALS');
+  realSecrets = EnvVars.getOptionalJson<Partial<Secrets>>('TEST_CREDENTIALS', {});
 }
 
 const DEFAULT_SECRETS: Secrets = {

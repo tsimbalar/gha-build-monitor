@@ -15,6 +15,8 @@
     "start": "HTTP_PORT=9900 node dist/index.js",
     "start:dev": "HTTP_PORT=9900 concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
     "test": "jest --testTimeout=15000",
+    "test:no-secrets": "jest --testTimeout=15000 -t='^((?!(#needs-secrets)).)*$' --silent",
+    "test:need-secrets": "jest --testTimeout=15000 -t=#needs-secrets --silent",
     "ts:check": "tsc --noEmit --noErrorTruncation ",
     "tsoa:gen": "tsoa spec-and-routes"
   },

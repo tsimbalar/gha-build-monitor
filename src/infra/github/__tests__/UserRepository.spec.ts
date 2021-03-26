@@ -10,7 +10,7 @@ describe('UserRepository', () => {
     buildInfo: {},
   });
   describe('getUserFromToken', () => {
-    test('should return user info with valid token', async () => {
+    test('should return user info with valid token #needs-secrets', async () => {
       const sut = new UserRepository(octokitFactory);
 
       const actual = await sut.getUserFromToken(testCredentials.PAT_NO_SCOPE);
@@ -21,7 +21,7 @@ describe('UserRepository', () => {
       });
     });
 
-    test('should return scopes of user with "repo" scope', async () => {
+    test('should return scopes of user with "repo" scope #needs-secrets', async () => {
       const sut = new UserRepository(octokitFactory);
 
       const actual = await sut.getUserFromToken(testCredentials.PAT_SCOPE_REPO);

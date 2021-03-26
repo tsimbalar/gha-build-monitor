@@ -34,6 +34,14 @@ export class EnvVars {
     return (JSON.parse(strValue) as unknown) as T;
   }
 
+  public static getOptionalJson<T>(envVarName: string, defaultValue: T): T {
+    const strValue = this.getOptionalString(envVarName, '');
+    if (!strValue) {
+      return defaultValue;
+    }
+    return (JSON.parse(strValue) as unknown) as T;
+  }
+
   public static getOptionalBool(envVarName: string, defaultValue: boolean = false): boolean {
     const value = process.env[envVarName];
     if (value === undefined) {
