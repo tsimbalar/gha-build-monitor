@@ -11,9 +11,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      # some tests need credentials when hitting github endpoints - see src/infra/github/__testTools__/secrets.ts.sample
-      TEST_CREDENTIALS: ${{ secrets.TEST_CREDENTIALS }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -50,8 +47,17 @@ jobs:
       - name: Typescript linting
         run: npm run lint
 
-      - name: Unit tests
-        run: npm run test
+      - name: Unit tests (no secrets)
+        # dependabot has no access to secrets - cf https://github.blog/changelog/2021-02-19-github-actions-workflows-triggered-by-dependabot-prs-will-run-with-read-only-permissions/
+        run: npm run test:no-secrets
+
+      - name: Unit tests (need secrets)
+        # we expect this to be a json
+        if: ${{ contains(env.TEST_CREDENTIALS, '{') }}
+        run: npm run test:need-secrets
+        env:
+          # some tests need credentials when hitting github endpoints - see src/infra/github/__testTools__/secrets.ts.sample
+          TEST_CREDENTIALS: ${{ secrets.TEST_CREDENTIALS }}
 
   build:
     needs: test
