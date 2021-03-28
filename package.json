@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@octokit/plugin-throttling": "3.4.1",
-    "@octokit/rest": "18.3.5",
+    "@octokit/rest": "18.5.2",
     "@tsoa/runtime": "3.6.1",
     "date-fns": "2.19.0",
     "express": "4.17.1",
