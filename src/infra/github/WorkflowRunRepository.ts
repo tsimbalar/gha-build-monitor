@@ -128,6 +128,9 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
         if (runConclusion === 'startup_failure') {
           return 'Failed';
         }
+        if (runConclusion === 'waiting') {
+          return 'Queued';
+        }
         break;
       case 'in_progress':
         return 'Running';
