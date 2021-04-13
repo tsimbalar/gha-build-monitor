@@ -60,6 +60,12 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
           continue;
         }
 
+        // ignore skipped workflows runs completely
+        if (this.shouldIgnoreWorkflowRun(run.status, run.conclusion)) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
         const status = this.parseWorkflowRunStatus(run.status, run.conclusion);
         let author: WorkflowRunAuthor | undefined;
         if (isLatestRunInThisBranch) {
@@ -77,6 +83,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
             };
           }
         }
+
         const workflowRun: WorkflowRun = {
           id: run.id.toString(),
           webUrl: run.html_url,
@@ -109,6 +116,11 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
     return `${run.event}#${run.head_branch}`;
   }
 
+  private shouldIgnoreWorkflowRun(runStatus: string, runConclusion: string): boolean {
+    // when a workflow has only skipped jobs, don't even report it.
+    return runStatus === 'completed' && runConclusion === 'skipped';
+  }
+
   private parseWorkflowRunStatus(runStatus: string, runConclusion: string): WorkflowRunStatus {
     // eslint-disable-next-line default-case
     switch (runStatus) {
@@ -118,9 +130,6 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
         }
         if (runConclusion === 'failure') {
           return 'Failed';
-        }
-        if (runConclusion === 'skipped') {
-          return 'Canceled';
         }
         if (runConclusion === 'cancelled') {
           return 'Canceled';
