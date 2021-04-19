@@ -63,7 +63,7 @@
     "@octokit/plugin-throttling": "3.4.1",
     "@octokit/rest": "18.5.2",
     "@tsoa/runtime": "3.6.1",
-    "date-fns": "2.20.1",
+    "date-fns": "2.21.1",
     "express": "4.17.1",
     "lru-cache": "6.0.0",
     "swagger-ui-express": "4.1.6"
