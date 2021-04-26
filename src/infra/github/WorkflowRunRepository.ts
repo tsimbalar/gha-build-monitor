@@ -137,6 +137,9 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
         if (runConclusion === 'startup_failure') {
           return 'Failed';
         }
+        if (runConclusion === 'action_required') {
+          return 'Running';
+        }
         break;
       case 'in_progress':
         return 'Running';
