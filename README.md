@@ -55,6 +55,18 @@ Get notified about new builds, failing builds etc
 
 <img src="./assets/03-monitor-builds.png" title="builds" width="60%">
 
+## FAQ
+### How to upgrade
+
+If you followed the previous instructions, you should be able to run those commands : 
+
+```bash
+docker stop gha-build-monitor
+docker rm gha-build-monitor
+docker pull ghcr.io/tsimbalar/gha-build-monitor:latest
+docker run --name gha-build-monitor -d -p 9901:9901 --restart unless-stopped ghcr.io/tsimbalar/gha-build-monitor
+```
+
 ---
 ## Roadmap
 
