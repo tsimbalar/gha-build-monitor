@@ -31,7 +31,7 @@ export class EnvVars {
 
   public static getJson<T>(envVarName: string): T {
     const strValue = this.getString(envVarName);
-    return (JSON.parse(strValue) as unknown) as T;
+    return JSON.parse(strValue) as unknown as T;
   }
 
   public static getOptionalJson<T>(envVarName: string, defaultValue: T): T {
@@ -39,7 +39,7 @@ export class EnvVars {
     if (!strValue) {
       return defaultValue;
     }
-    return (JSON.parse(strValue) as unknown) as T;
+    return JSON.parse(strValue) as unknown as T;
   }
 
   public static getOptionalBool(envVarName: string, defaultValue: boolean = false): boolean {
