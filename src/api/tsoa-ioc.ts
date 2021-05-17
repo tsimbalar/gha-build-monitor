@@ -8,9 +8,9 @@ class IocContainerAdapter implements IocContainer {
   public constructor(private readonly controllerFactory: IControllerFactory) {}
 
   public get<T>(controller: { prototype: T }): T {
-    return (this.controllerFactory.get<T>(
-      (controller as unknown) as ConstructorFunction<T>
-    ) as unknown) as T;
+    return this.controllerFactory.get<T>(
+      controller as unknown as ConstructorFunction<T>
+    ) as unknown as T;
   }
 }
 
