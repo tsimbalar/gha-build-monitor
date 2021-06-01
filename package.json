@@ -45,7 +45,7 @@
     "@typescript-eslint/eslint-plugin": "4.24.0",
     "@typescript-eslint/parser": "4.23.0",
     "concurrently": "6.1.0",
-    "eslint": "7.26.0",
+    "eslint": "7.27.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
     "jest": "26.6.3",
@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@octokit/plugin-throttling": "3.4.1",
-    "@octokit/rest": "18.5.3",
+    "@octokit/rest": "18.5.5",
     "@tsoa/runtime": "3.8.0",
     "date-fns": "2.21.3",
     "express": "4.17.1",
