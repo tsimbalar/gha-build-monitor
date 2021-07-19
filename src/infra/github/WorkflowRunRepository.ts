@@ -8,7 +8,6 @@ import {
   WorkflowRunsPerBranch,
 } from '../../domain/IWorkflowRunRepository';
 import { ICommitAuthorRepository } from './CommitAuthorRepository';
-import { Octokit } from '@octokit/rest';
 import { OctokitFactory } from './OctokitFactory';
 import { RepoName } from '../../domain/IRepoRepository';
 import { parseISO } from 'date-fns';
@@ -73,7 +72,8 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
           const commitAuthor = await this.commitAuthorRepo.getAuthorForCommit(
             token,
             repoName,
-            run.head_commit.id
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            run.head_commit!.id
           );
 
           if (commitAuthor) {
@@ -87,7 +87,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
         const workflowRun: WorkflowRun = {
           id: run.id.toString(),
           webUrl: run.html_url,
-          name: run.name,
+          name: run.name ?? '?',
           startTime: parseISO(run.created_at),
           status,
           finishTime: parseISO(run.updated_at),
@@ -106,9 +106,10 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
     return result;
   }
 
-  private getBranchKey(run: { head_branch: string; event: string }): string {
+  private getBranchKey(run: { head_branch: string | null; event: string }): string {
     if (run.event === 'push') {
-      return run.head_branch;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return run.head_branch!;
     }
     if (run.event === 'pull_request') {
       return `PR#${run.head_branch}`;
@@ -116,12 +117,15 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
     return `${run.event}#${run.head_branch}`;
   }
 
-  private shouldIgnoreWorkflowRun(runStatus: string, runConclusion: string): boolean {
+  private shouldIgnoreWorkflowRun(runStatus: string | null, runConclusion: string | null): boolean {
     // when a workflow has only skipped jobs, don't even report it.
     return runStatus === 'completed' && runConclusion === 'skipped';
   }
 
-  private parseWorkflowRunStatus(runStatus: string, runConclusion: string): WorkflowRunStatus {
+  private parseWorkflowRunStatus(
+    runStatus: string | null,
+    runConclusion: string | null
+  ): WorkflowRunStatus {
     // eslint-disable-next-line default-case
     switch (runStatus) {
       case 'completed':
