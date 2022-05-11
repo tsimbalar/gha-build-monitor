@@ -30,6 +30,7 @@ export function finalErrorHandler(): express.ErrorRequestHandler {
     if (!err.statusCode) err.statusCode = 500; // Sets a generic server error status code if none is part of the err
 
     res.set('Content-Type', APPLICATION_JSON);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     res.status(err.statusCode);
     const errorJson: GenericErrorJson = { error: 'An error occurred', code: err.statusCode };
     res.json(errorJson);
