@@ -176,6 +176,6 @@ describe('WorkflowRunRepository', () => {
         ([branch, runs]) => runs.length > maxRunsPerBranch
       );
       expect(branchRunsWithMoreThanNBuilds).toHaveLength(0);
-    }, 15000 /* timeout - can take a while */);
+    }, 60000 /* timeout - can take a while */);
   });
 });

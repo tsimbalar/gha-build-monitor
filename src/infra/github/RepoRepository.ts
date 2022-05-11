@@ -8,15 +8,9 @@ export class RepoRepository implements IRepoRepository {
   public async listForToken(token: string): Promise<ReadonlyArray<Repo>> {
     const octokit = this.octokitFactory(token);
 
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
     const allRepos = await octokit.paginate(octokit.repos.listForAuthenticatedUser, {
       sort: 'full_name',
       direction: 'asc',
-      // ignore things that haven't been updated recently
-      // for me this allows to go from 200+ repos to ~75
-      since: thirtyDaysAgo.toISOString(),
     });
 
     const workflowsPerRepo = await this.getWorkflowsPerRepo(
