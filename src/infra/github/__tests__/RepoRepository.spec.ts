@@ -59,6 +59,6 @@ describe('RepoRepository', () => {
 
       const spacesWithWorkflows = spacesWithoutTsimbalar.filter((s) => s.workflows.length > 0);
       expect(spacesWithWorkflows).not.toHaveLength(0);
-    }, 20000 /* this may take a while */);
+    }, 60000 /* this may take a while */);
   });
 });
