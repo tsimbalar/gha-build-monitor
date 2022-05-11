@@ -21,14 +21,12 @@ export class RepoRepository implements IRepoRepository {
 
     const workflowsPerRepo = await this.getWorkflowsPerRepo(
       octokit,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      allRepos.map((r) => new RepoName(r.owner!.login, r.name))
+      allRepos.map((r) => new RepoName(r.owner.login, r.name))
     );
 
     return allRepos.map((r) => ({
       id: r.id.toString(),
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      name: new RepoName(r.owner!.login, r.name),
+      name: new RepoName(r.owner.login, r.name),
       webUrl: r.html_url,
       workflows: workflowsPerRepo.get(r.full_name) ?? [],
     }));
