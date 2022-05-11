@@ -35,7 +35,7 @@ describe('UserRepository', () => {
     test('should throw when token does not match a user', async () => {
       const sut = new UserRepository(octokitFactory);
 
-      let caughtError!: Error;
+      let caughtError!: unknown;
       try {
         await sut.getUserFromToken('some_random_token');
       } catch (e) {
