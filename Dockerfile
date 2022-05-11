@@ -1,6 +1,6 @@
 # image build
 ARG NODE_VERSION
-FROM node:14.15.1-alpine AS build
+FROM node:16.15.0-alpine AS build
 
 # hadolint ignore=DL3018
 RUN apk --no-cache add ca-certificates curl
@@ -23,7 +23,7 @@ RUN npm run build
 RUN npm ci --production
 
 # Use multistage to create a small size image
-FROM node:14.15.1-alpine
+FROM node:16.15.0-alpine
 ENV HOME_DIR /app
 ENV WHATAMI gha-build-monitor
 ENV NODE_ENV production
